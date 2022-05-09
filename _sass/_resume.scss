@@ -1,0 +1,37 @@
+
+#resume {
+  clear:both;
+  width: 90%;
+  margin: 0 auto;
+  max-width: 960px;
+  @media only screen and (min-width: $cut) {
+    width: 80%;
+  }
+}
+
+
+.resume {
+  .project-link {
+	  width: 300px;
+  }
+}
+
+.resume-link {
+  display: inline-block;
+  padding-right: 3em;
+  padding-bottom: 1em;
+
+  a {
+    text-decoration: none;
+    color: black;
+    font-size: 1.3em;
+    font-style: italic;
+    i {
+      color: darkred;
+      margin-right: 1em;
+    }
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}

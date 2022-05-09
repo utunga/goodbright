@@ -1,0 +1,66 @@
+---
+---
+
+@import "lib/normalize";
+@import "lib/fontawesome";
+@import "lib/devicon";
+
+@import 'base';
+@import 'vars';
+@import 'animation';
+@import 'header';
+@import 'about';
+@import 'projects';
+@import 'resume';
+@import 'footer';
+
+
+#skills {
+  width: 90%;
+  margin: 0 auto;
+  max-width: 960px;
+  @media only screen and (min-width: $cut) {
+    width: 80%;
+  }
+  h4 {
+    padding-top: 0;
+  }
+}
+
+.email_display {
+	display: none;
+}
+
+.zoom {
+  
+  transition: transform .2s; /* Animation */
+  margin: 0 auto;
+}
+
+.zoom:hover {
+  transform: scale(1.5); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+}
+
+.am_available {
+  font-weight: bolder;
+  color: green;
+  cursor: pointer;
+}
+.not_available {
+  display: none;
+  font-weight: bold;
+  color: darkkhaki;
+}
+
+.am_available.blink {
+  -webkit-animation: pulse 1000ms infinite alternate;
+          animation: pulse 1000ms infinite alternate;
+}
+@-webkit-keyframes pulse {
+  0% { color: white; }
+  100% {color: green; }
+}
+@keyframes pulse {
+  0% {  color: white }
+  100% { color: green; }
+}

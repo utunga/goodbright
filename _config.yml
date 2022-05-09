@@ -11,8 +11,10 @@ email: miles@goodbright.nz
 twitter_username: utunga
 github_username:  utunga
 insta_username:  utunga216
-medium_username: utunga
+medium_username: utunga216
 
+sass:
+    style: compressed
 
 # Google-analytics
 google-analytics:

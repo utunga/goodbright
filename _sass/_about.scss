@@ -1,0 +1,165 @@
+#about {
+  width: 90%;
+  margin: 0 auto;
+  max-width: 960px;
+  display: flex;
+  @media only screen and (min-width: $cut) {
+    width: 80%;
+  }
+  h2, h4 {
+    padding-top: 0;
+  }
+  h4.qual {
+    font-size: 1.2em;
+    @media only screen and (min-width: $cut) {
+      margin-top: 1.2em;
+      font-size: 1.3em;
+    }
+  }
+  h3 {
+    padding-top: 0.5em;
+  }
+
+  h4.spaced_under_empty_cert {
+    padding-top: 1em;
+  }
+
+  .active_projects {
+
+    margin-bottom: 3em;
+
+    a.active_project {
+      font-weight: bold;
+      text-decoration: none;
+      color: black;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    ul {
+      padding-left: 1em;
+    }
+
+    li {
+      clear: left;
+      margin-bottom: 1em;
+    }
+
+    i.status {
+      float: right;
+      font-size: .8em;
+      font-variant: small-caps;
+      font-style: normal;
+      font-weight: bold;
+    }
+
+  }
+
+  .resume-link {
+    display:none;
+    @media only screen and (min-width: $cut) {
+        display:block;
+    }
+    a {
+      font-size: 1.1rem;
+      font-style: normal;
+      padding-left: 0.1rem
+    }
+  }
+}
+
+.tech {
+  margin: 10px;
+}
+
+.left_block, .right_block {
+  min-width: 300px;
+}
+
+.left_block {
+  @media only screen and (min-width: $cut) {
+    width: 46%;
+    float: left;
+  }
+}
+
+.right_block {
+  @media only screen and (min-width: $cut) {
+    width: 46%;
+    float: right;
+  }
+}
+
+.subhead {
+    font-family: 'Cardo',serif;
+    margin-top: -30px;
+    padding-top: 0;
+    font-style: italic;
+    font-size: 1.2em;
+}
+
+.user-details {
+  clear: both;
+  margin: 5px auto;
+}
+
+.cert {
+  position: relative;
+  font-family: 'Cardo',serif;
+  margin-top: -1em;
+  padding-top: 0;
+  font-style: italic;
+}
+
+.cert_img{
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 80px;
+  height: 80px;
+  display: block;
+  position: absolute;
+  top: -1.5em;
+  right: 0px;
+}
+
+.cert_bsc {
+  background-image: url("../img/canterbury.png");
+}
+.cert_ba {
+  background-image: url("../img/otago.png");
+}
+.cert_scrum_master {
+  background-image: url("../img/certified_scrum_master_seal.png");
+}
+
+.cert_patent {
+
+}
+
+.cert_trusted_seed {
+  background-image: url("../img/trusted-seed-commons-stack-2021-logo-1638294157325.png");
+  max-width: 60px;
+  max-height: 60px;
+  margin-right: 10px;
+}
+
+/*
+.user {
+  text-align: center;
+  font-size: 60px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  p {
+    font-size: 16px;
+  }
+  @media only screen and (min-width: $cut) {
+    flex-wrap: nowrap;
+    font-size: 75px;
+  }
+}
+
+
+*/
