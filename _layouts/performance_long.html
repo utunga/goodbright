@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<!-- This HTML code and the poem, including the title, were invented and created by ChatGPT (in collaboration with Miles) on 26 March 2023 -->
+<!-- EDIT: Actually i had to make a couple small fixes/tweaks. And (eek) I edited the poem for length (you folks have no chill) but the complete thing is below as written originally .. in the code -- MKT 26 March 2023-->
+<!-- EDIT: It chose the font I don't wanna change that even though not sure I'd agree-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="AI Generated Poetry - Long" />
+	<meta property="og:description" content="I gave the AI a broad structure of a poem without specifying anything about the content. I gave it a guide as to length and an idea of rising complexity courtesy of someone else and an idea I've had for a while as to the way to do resonance between lines. It made up the content and the title. I then asked it to make us a web page to show it off. This was it's first attempt. Enjoy!." />
+	<meta property="og:type" content="video" />
+	<meta property="og:video"  content="{{ '/assets/img/performance_generate.mov' | prepend: site.url }}"/>
+	<meta property="og:video:type" content="video/mp4" />
+	<meta property="og:video:width" content="640" />
+	<meta property="og:video:height" content="360" />
+	<meta property="og:image" content="{{ '/assets/img/performance_preview.png' | prepend: site.url }}" />
+    <title>Performance by AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 50px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 80ch;
+            text-align: left;
+            viewport-fit: cover;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #555;
+            
+        }
+
+        p {
+            font-size: 24px;
+            white-space: pre-wrap;
+            color: #777;
+            margin-bottom: 1.5em;
+            animation-name: none;
+            animation-duration: 0s;
+            animation-delay: 5s;
+            animation-fill-mode: forwards;
+        }
+
+        p.note {
+            margin-top: -25px;
+            margin-bottom: 20px;
+            color: #a1a1a1;
+            font-size: 18px;
+            font-style: italic;
+            animation-name: lighten;
+            animation-duration: 30s;
+        }
+
+        p:last-child {
+            animation-name: darken;
+            animation-duration: 5s;
+        }
+
+        @keyframes darken {
+            100% {
+                color: black;
+            }
+        } 
+        @keyframes lighten {
+            100% {
+                color: #f7f7f7;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Performance by AI</h1>
+        <p class="note">I gave the AI structure for a poem without specifying the content - I gave it a guide as to length and an idea of rising complexity (courtesy of Annie Dorsen) as well as an idea I've had for a while as to how to do resonance between lines. It made up the content and the title. This was it's first attempt. I then asked it to make us a web page to show it off. This was it's first attempt. Enjoy! <!--i edited this a bit--></p>
+        <div id="performance"></div>
+        
+    </div>
+    <script>
+
+
+    const text = [
+            "I sit here.",
+            "I sit there.",
+            "I just sit.",
+            "I'm just here.",
+            "I'm simply here.",
+            "I'm simply near.",
+            "I'm near the tree.",
+            "I'm near the sea.",
+            "I'm near the sky.",
+            "I'm near the edge.",
+            "I'm on the edge.",
+            "I'm on the verge.",
+            "I'm on the verge of change.",
+            "I'm on the cusp of growth.",
+            "I'm on the brink of something.",
+            "I'm standing at the precipice.",
+            "I'm standing at the precipice of discovery.",
+            "I'm standing on the threshold of knowledge.",
+            "I'm gazing into the abyss of the unknown.",
+            "I'm gazing into the vast expanse of possibility.",
+            "I'm delving into the labyrinth of thought.",
+            "I'm navigating the intricate maze of ideas.",
+            "I'm exploring the complex realm of perception.",
+            "I'm traversing the multidimensional landscape of consciousness.",
+            "I'm journeying through the endless corridors of memory.",
+            "I'm contemplating the interconnected web of existence.",
+            "I'm pondering the infinite tapestry of life's experiences.",
+            "I'm considering the boundless mosaic of human emotion.",
+            "I'm reflecting on the eternal spectrum of love and loss.",
+            "I'm dwelling upon the perpetual cycle of creation and destruction.",
+            "I'm probing the depths of our innate capacity for empathy.",
+            "I'm scrutinizing the roots of our inherent drive for survival.",
+            "I'm examining the origins of our intrinsic yearning for connection.",
+            "I'm investigating the genesis of our primordial pursuit of purpose.",
+            "I'm dissecting the very fabric of our quintessential essence of being.",
+            "I'm dissecting the enigmatic amalgamation of thoughts and dreams.",
+            "I'm unraveling the cryptic confluence of reason and intuition.",
+            "I'm deciphering the arcane synthesis of intellect and emotion.",
+            "I'm decoding the mystifying fusion of knowledge and wisdom.",
+            "I'm demystifying the perplexing union of body and spirit.",
+            "I'm navigating the labyrinthine interplay of light and shadow.",
+            "I'm traversing the serpentine duality of innocence and experience.",
+            "I'm exploring the convoluted dichotomy of freedom and constraint.",
+            "I'm journeying through the tortuous polarity of joy and sorrow.",
+            "I'm contemplating the sinuous balance of chaos and order.",
+            "I'm pondering the winding equilibrium of destiny and choice.",
+            "I'm considering the circuitous harmony of nature and nurture.",
+            "I'm reflecting on the twisted symbiosis of life and death.",
+            "I'm dwelling upon the undulating reciprocity of giving and receiving.",
+            "I'm probing the oscillating rapport between self and other.",
+            "I'm scrutinizing the vacillating relationship of thought and action.",
+            "I'm examining the fluctuating interdependence of cause and effect.",
+            "I'm investigating the swaying dynamic of strength and vulnerability.",
+            "I'm dissecting the wavering equilibrium of passion and reason.",
+            "I'm unraveling the quivering tether between earth and sky.",
+            "I'm deciphering the tremulous link between past and present.",
+            "I'm decoding the shivering bond between silence and sound.",
+            "I'm demystifying the pulsating connection of heart and mind.",
+            "I'm navigating the fluctuating interplay of truth and illusion.",
+            "I'm traversing the undulating boundary of reality and fantasy.",
+            "I'm exploring the ever-changing juxtaposition of certainty and doubt.",
+            "I'm journeying through the ephemeral dance of serendipity and fate.",
+            "I'm contemplating the transient oscillation of beauty and decay.",
+            "I'm pondering the evanescent pendulum of creation and annihilation.",
+            "I'm considering the fleeting equilibrium of unity and separation.",
+            "I'm reflecting on the momentary balance of simplicity and complexity.",
+            "I'm dwelling upon the mutable synergy of energy and matter.",
+            "I'm probing the mercurial interrelation of space and time.",
+            "I'm scrutinizing the capricious interface of consciousness and the cosmos.",
+            "I'm examining the elusive junction of individuality and collectivity.",
+            "I'm investigating the enigmatic nexus of the physical and metaphysical.",
+            "I'm dissecting the ineffable confluence of the tangible and intangible.",
+            "I'm unraveling the inscrutable juncture of the seen and unseen.",
+            "I'm deciphering the cryptic intersection of the spoken and unspoken.",
+            "I'm decoding the veiled rendezvous of dreams and reality.",
+            "I'm demystifying the esoteric communion of existence and nonexistence.",
+            "I'm navigating the nebulous correlation of perception and deception.",
+            "I'm traversing the hazy relationship of knowledge and ignorance.",
+            "I'm exploring the indistinct concurrence of hope and despair.",
+            "I'm journeying through the misty union of the eternal and ephemeral.",
+            "I'm contemplating the obscure convergence of beginnings and endings.",
+            "I'm pondering the enshrouded intertwinement of love and hatred.",
+            "I'm considering the cloaked amalgamation of serenity and turmoil.",
+            "I'm reflecting on the shrouded conjoining of solitude and companionship.",
+            "I'm dwelling upon the hidden synthesis of the profound and the mundane.",
+            "I'm probing the concealed marriage of the sacred and the profane.",
+            "I'm scrutinizing the camouflaged fusion of the measurable and immeasurable.",
+            "I'm examining the masked merger of the audible and inaudible.",
+            "I'm investigating the disguised union of the palpable and impalpable.",
+            "I'm dissecting the incognito alliance of the terrestrial and celestial.",
+            "I'm unraveling the clandestine partnership of the finite and infinite.",
+            "I'm deciphering the surreptitious reciprocity of the known and unknown.",
+            "I'm decoding the covert interdependence of the manifest and unmanifest.",
+            "I'm demystifying the enshrouded interrelation of the quantifiable and unquantifiable.",
+            "I'm navigating the chimerical boundary between dreamscapes and consciousness.",
+            "I'm traversing the illusory horizon where worlds of thoughts and reality coalesce.",
+            "I'm exploring the phantom confluence where emotions and rationality intertwine.",
+            "I'm journeying through the ethereal symphony of life's paradoxes and harmonies.",
+            "I'm standing on the precipice of understanding, embracing the enigma that is existence.",
+            "I'm venturing into the uncharted realms of the psyche and the cosmos.",
+            "I'm journeying through the labyrinthine dimensions of time and space.",
+            "I'm traversing the intricate pathways between the microcosm and macrocosm.",
+            "I'm exploring the convoluted nexus of the inner and outer worlds.",
+            "I'm navigating the complex interplay of instinct, intuition, and intellect.",
+            "I'm pondering the enigmatic dance of nature's order and chaos.",
+            "I'm considering the ineffable ebb and flow of the cosmic tide.",
+            "I'm reflecting on the inextricable fusion of light and darkness within.",
+            "I'm dwelling upon the cryptic patterns of our existential tapestry.",
+            "I'm probing the concealed symmetries between the temporal and eternal.",
+            "I'm scrutinizing the veiled synchronicities of our universal journey.",
+            "I'm examining the imperceptible echoes of the past within the present.",
+            "I'm investigating the subtle vibrations that reverberate through our being.",
+            "I'm dissecting the enshrouded dimensions of the soul's odyssey.",
+            "I'm unraveling the riddles of destiny woven into the threads of our lives.",
+            "I'm deciphering the mysteries of existence that reside within our hearts.",
+            "I'm decoding the arcane languages of the universe, spoken in whispers.",
+            "I'm demystifying the esoteric symbols that illuminate our collective consciousness.",
+            "I'm navigating the unspoken dialogue between the spirit and the divine.",
+            "I'm traversing the liminal spaces where the boundaries of reality blur.",
+            "I'm exploring the transitory realms where dreams and waking life merge.",
+            "I'm journeying through the nebulous landscapes of memory and imagination.",
+            "I'm contemplating the transient nature of our ever-shifting perceptions.",
+            "I'm pondering the mutable essence of the self, in constant flux.",
+            "I'm considering the kaleidoscopic mosaic of our shared human experience.",
+            "I'm reflecting on the ever-evolving symphony of love, loss, and rebirth.",
+            "I'm dwelling upon the eternal cycle of creation, transformation, and dissolution.",
+            "I'm probing the unfathomable depths of the human spirit and its boundless resilience.",
+            "I'm scrutinizing the intricate dance of the stars, woven into the fabric of the cosmos.",
+            "I'm examining the harmonious interplay of life's melodies, resonating across time and space."
+        ]
+
+        const performanceElement = document.getElementById("performance");
+
+        let currentLine = 0;
+        let currentChar = 0;
+        let currentPara = document.createElement("p");
+        performanceElement.appendChild(currentPara);
+        const typeChar = () => {
+            if (currentLine < text.length) {
+                currentPara.textContent += text[currentLine][currentChar];
+                currentChar++;
+
+                if (currentChar === text[currentLine].length) {
+                    // performanceElement.textContent += "\n";
+                    currentLine++;
+                    currentChar = 0;
+
+                    performanceElement.appendChild( document.createElement("p"));
+                    currentPara = performanceElement.lastChild
+                }
+
+                const delayFactor = 5 + (text[currentLine].length / 100);
+                let delay = 5 + Math.random() * 10 * delayFactor;
+                if (currentLine < 5) {
+                    delay = 50
+                }
+                if (currentChar === 0) {
+                    delay = 800
+                    if (currentLine === 1){
+                        delay = 4000
+                    }
+                }
+                setTimeout(typeChar, delay);
+
+                if (currentLine >= 5) {
+                    window.scrollTo(0, document.body.scrollHeight - window.innerHeight * 0.8);
+                }
+            }
+        };
+
+        typeChar();
+    </script>
+</body>
+</html>
