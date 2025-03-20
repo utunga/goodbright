@@ -1,4 +1,6 @@
-#  GoodBright Consulting Home page (fork of Particle Jekyll Theme)
+#  GoodBright (fork of Particle Jekyll Theme)
+
+see https://goodbright.nz
 
 ## Basic Setup
 
