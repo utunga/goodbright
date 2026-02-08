@@ -1,17 +1,16 @@
 # Site settings
-title: Goodbright Consulting 
-description: Miles Thompson's professional home 
+title: Goodbright Consulting
 # baseurl: "/particle" # the subpath of your site, e.g. /blog
 url: "http://goodbright.nz" # the base hostname & protocol for your site e.g. http://willianjusten.com.br
 logo: "/assets/img/goodbright_logo_sq.png"
 
 # User settings
-site_description: Miles Thompson's professional home
-email: miles@goodbright.nz
-twitter_username: utunga
+site_description: Miles Thompson on the web
+email: utunga @̸̅ͅ gmail.com
 github_username:  utunga
 insta_username:  utunga216
 medium_username: utunga216
+repository: utunga/goodbright
 
 sass:
     style: compressed
