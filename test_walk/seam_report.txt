@@ -1,0 +1,18 @@
+piece: 'crescent to grass st' n=12 length=444 m
+piece: 'Directions from home to the crescent' n=68 length=767 m
+piece: 'Directions from 8A Grass Street, Oriental Bay 6011, New Zealand to 114 Maida Vale Road, Roseneath, Wellington 6011, New Zealand' n=192 length=2068 m
+start: 'Directions from home to the crescent' (as drawn), 17 m from 'Home'
+order: 'Directions from home to the crescent' -> 'crescent to grass st' -> 'Directions from 8A Grass Street, Oriental Bay 6011, New Zealand to 114 Maida Vale Road, Roseneath, Wellington 6011, New Zealand'
+seam -> 'crescent to grass st': gap 43 m (bridged with a straight line)
+seam -> 'Directions from 8A Grass Street, Oriental Bay 6011, New Zealand to 114 Maida Vale Road, Roseneath, Wellington 6011, New Zealand': gap 10 m (bridged with a straight line)
+joined route: 272 vertices, 3.33 km
+milestone  0 'Home': 17 m from route, 0.00 km along, +0 min
+milestone  1 'The Crescent': 2 m from route, 0.77 km along, +20 min
+milestone  2 'Grass Street': 0 m from route, 1.26 km along, +60 min
+milestone  3 'The Point': 20 m from route, 2.23 km along, +75 min
+milestone  4 'Home again': 32 m from route, 3.33 km along, +90 min
+extended route 32 m to the finish with a straight line
+leg  1 'Home' -> 'The Crescent': 0.77 km in 20 min = 2.3 km/h
+leg  2 'The Crescent' -> 'Grass Street': 0.50 km in 20 min = 1.5 km/h
+leg  3 'Grass Street' -> 'The Point': 0.96 km in 15 min = 3.8 km/h
+leg  4 'The Point' -> 'Home again': 1.14 km in 15 min = 4.6 km/h
