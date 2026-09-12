@@ -806,10 +806,10 @@ table.tt button.mark{border:0;background:#eef2f7;border-radius:6px;padding:3px 8
   <button class="close" data-close="menuSheet">Close</button>
   <h2 id="menuTitle">Test Walk</h2>
   <button id="btnOffline">Save map for offline</button>
-  <div class="hint" id="offlineHint">Do this at home on wifi. It stores the map tiles along the whole route on this phone so the map still shows where there's no signal.</div>
+  <div class="hint" id="offlineHint">Do this at home on wifi. It stores the Topo50 map tiles along the whole route on this phone, so the map still shows where there's no signal (switch to Map: Topo when you lose signal; the app also does this itself if the street tiles stop loading).</div>
   <div id="progress"><div></div></div>
   <button id="btnLayer">Map: Topo</button>
-  <div class="hint">Switch between the NZ Topo50 map (tracks, contours) and street maps.</div>
+  <div class="hint">Streets (OpenStreetMap), NZ Topo50 (tracks, contours — this is the one saved offline), OpenTopo. The wiggly-line button on the map hides or shows the route.</div>
   <button id="btnFollow">Follow me: on</button>
   <button id="btnPrint">Printable map sheets</button>
   <button id="btnCheckin2">Send a check-in</button>
@@ -901,7 +901,7 @@ const state = {
   reached: JSON.parse(localStorage.getItem(STORE+'reached') || '[]'),
   pos: null, acc: null, posAt: null,
   along: null, off: null,
-  follow: true, layer: localStorage.getItem(STORE+'layer') || 'topo',
+  follow: true, layer: localStorage.getItem(STORE+'layer') || 'osm', routeOn: localStorage.getItem(STORE+'route') !== 'off',
   sim: /[?&]sim/.test(location.search),
 };
 const save = () => { localStorage.setItem(STORE+'startAt', state.startAt || ''); localStorage.setItem(STORE+'reached', JSON.stringify(state.reached)); };
@@ -951,7 +951,7 @@ const layers = {
 };
 const layerNames = {topo:'Topo', topoPlain:'Topo (no offline)', osm:'Streets', otm:'OpenTopo'};
 const layerOrder = ['topo','topoPlain','osm','otm'];   // fallback order when a layer's tiles won't load
-const layerCycle = ['topo','osm','otm'];               // what the menu button cycles through
+const layerCycle = ['osm','topo','otm'];               // what the menu button cycles through
 let curLayer = null;
 const tileStats = {ok:0, err:0};
 function setLayer(name){
@@ -962,13 +962,15 @@ function setLayer(name){
   localStorage.setItem(STORE+'layer', name);
 }
 for (const k of layerOrder){
-  layers[k].on('tileload', (e) => { if (!(e.tile && /^data:/.test(e.tile.getAttribute('src') || ''))) tileStats.ok++; });   // the blank error tile also fires tileload
+  layers[k].on('tileload', (e) => { if (!(e.tile && /^data:/.test(e.tile.getAttribute('src') || ''))){ tileStats.ok++; tileStats.hops = 0; } });   // the blank error tile also fires tileload
   layers[k].on('tileerror', () => {
     tileStats.err++;
-    if (k === curLayer && tileStats.ok === 0 && tileStats.err >= 6 && navigator.onLine){
+    if (k === curLayer && tileStats.ok === 0 && tileStats.err >= 6 && (tileStats.hops || 0) < layerOrder.length){
+      // this layer is dead (no key, no signal, blocked): try the next one, at most once round the list
       const next = layerOrder[(layerOrder.indexOf(k)+1) % layerOrder.length];
-      toast(layerNames[k] + ' map tiles are not loading — switching to ' + layerNames[next], 6000);
-      setLayer(next);
+      const hops = (tileStats.hops || 0) + 1;
+      toast(layerNames[k] + ' map tiles are not loading — trying ' + layerNames[next], 6000);
+      setLayer(next); tileStats.hops = hops;
     }
   });
 }
@@ -976,15 +978,21 @@ setLayer(state.layer);
 
 // route
 const routeLatLngs = W.route;
-L.polyline(routeLatLngs, {color:'#fff', weight:8, opacity:.9, lineCap:'round', lineJoin:'round'}).addTo(map);
-const routeLine = L.polyline(routeLatLngs, {color:'#e8590c', weight:4.5, opacity:1, lineCap:'round', lineJoin:'round'}).addTo(map);
-const doneLine = L.polyline([], {color:'#9a6b4c', weight:4.5, opacity:1, lineCap:'round', lineJoin:'round'}).addTo(map);
+const routeGroup = L.layerGroup().addTo(map);   // everything that can be hidden with the route button
+L.polyline(routeLatLngs, {color:'#fff', weight:7, opacity:.45, lineCap:'round', lineJoin:'round', interactive:false}).addTo(routeGroup);
+const routeLine = L.polyline(routeLatLngs, {color:'#e8590c', weight:4, opacity:.55, lineCap:'round', lineJoin:'round', interactive:false}).addTo(routeGroup);
+const doneLine = L.polyline([], {color:'#9a6b4c', weight:4, opacity:.5, lineCap:'round', lineJoin:'round', interactive:false}).addTo(routeGroup);
 for (const [i,j] of W.bridges){
-  L.polyline([routeLatLngs[i], routeLatLngs[j]], {color:'#7c3aed', weight:4, dashArray:'6 6', opacity:.9}).addTo(map)
+  L.polyline([routeLatLngs[i], routeLatLngs[j]], {color:'#7c3aed', weight:4, dashArray:'6 6', opacity:.7}).addTo(routeGroup)
    .bindTooltip('joined by hand — check on the ground', {className:'lbl'});
 }
 for (const ex of W.extras){
-  L.polyline(ex.coords, {color:'#4b5563', weight:3, dashArray:'4 8', opacity:.9}).addTo(map).bindTooltip(ex.label, {className:'lbl'});
+  L.polyline(ex.coords, {color:'#4b5563', weight:3, dashArray:'4 8', opacity:.7}).addTo(routeGroup).bindTooltip(ex.label, {className:'lbl'});
+}
+function setRoute(on){
+  state.routeOn = on; localStorage.setItem(STORE+'route', on ? 'on' : 'off');
+  if (on){ if (!map.hasLayer(routeGroup)) routeGroup.addTo(map); } else map.removeLayer(routeGroup);
+  const b = $('cRoute'); if (b) b.classList.toggle('on', on);
 }
 const SVG = {
   toilet: '<svg viewBox="0 0 24 24" fill="#0e7490"><circle cx="8" cy="4.5" r="2"/><path d="M6 8h4v6H9v7H7v-7H6z"/><circle cx="16.5" cy="4.5" r="2"/><path d="M14 8h5l1.5 7h-1.8l1 6h-4.4l1-6h-1.8z"/></svg>',
@@ -1015,9 +1023,11 @@ map.on('dragstart', () => { if (state.follow) setFollow(false); });
 
 // custom controls
 const ctl = document.createElement('div'); ctl.className = 'ctl'; ctl.style.bottom = '30px';
-ctl.innerHTML = '<button id="cFollow" title="Follow me">◎</button><button id="cAll" title="Whole route">⤢</button>';
+ctl.innerHTML = '<button id="cRoute" title="Show or hide the route line"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c3-7 6-9 8-7s4 4 8-7"/></svg></button><button id="cFollow" title="Follow me">◎</button><button id="cAll" title="Whole route">⤢</button>';
 $('map').appendChild(ctl);
 $('cFollow').onclick = () => { setFollow(true); if (state.pos) map.setView(state.pos, Math.max(map.getZoom(), 15)); };
+$('cRoute').onclick = () => setRoute(!state.routeOn);
+setRoute(state.routeOn);
 $('cAll').onclick = () => { setFollow(false); map.fitBounds(routeLine.getBounds(), {padding:[20,20]}); };
 function setFollow(on){ state.follow = on; $('cFollow').classList.toggle('on', on); $('btnFollow').textContent = 'Follow me: ' + (on?'on':'off'); }
 setFollow(true);

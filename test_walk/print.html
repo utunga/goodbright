@@ -733,7 +733,7 @@ body{margin:0;background:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,"S
 <div id="bar">
   <b>Test Walk — print sheets</b>
   <label>Scale <select id="scale"><option value="auto" selected>auto</option><option value="10000">1:10,000</option><option value="15000">1:15,000</option><option value="20000">1:20,000</option><option value="25000">1:25,000</option><option value="30000">1:30,000</option><option value="40000">1:40,000</option></select></label>
-  <label>Map <select id="layer"><option value="topo">LINZ Topo50</option><option value="otm">OpenTopoMap</option><option value="osm">OpenStreetMap</option></select></label>
+  <label>Map <select id="layer"><option value="osm" selected>Streets (OpenStreetMap)</option><option value="topo">LINZ Topo50</option><option value="otm">OpenTopoMap</option></select></label>
   <span id="status">…</span>
   <button id="print" disabled>Print / Save as PDF</button>
   <a href="./">← back to the app</a>
@@ -856,8 +856,8 @@ function updateStatus(){
   $('print').disabled = pending > 0;
 }
 function drawFeatures(map, opts){
-  L.polyline(W.route, {color:'#fff', weight:opts.big?9:6, opacity:.9}).addTo(map);
-  L.polyline(W.route, {color:'#e8590c', weight:opts.big?4.5:3, opacity:1}).addTo(map);
+  L.polyline(W.route, {color:'#fff', weight:opts.big?8:6, opacity:.5}).addTo(map);
+  L.polyline(W.route, {color:'#e8590c', weight:opts.big?4:3, opacity:.75}).addTo(map);
   for (const [i,j] of W.bridges) L.polyline([W.route[i], W.route[j]], {color:'#7c3aed', weight:opts.big?4:3, dashArray:'6 6'}).addTo(map);
   for (const ex of W.extras) L.polyline(ex.coords, {color:'#4b5563', weight:3, dashArray:'4 8'}).addTo(map);
   const dirs = {right:[1,0], left:[-1,0], top:[0,1], bottom:[0,-1]};
@@ -917,7 +917,7 @@ function build(){
   cover.innerHTML = '<div class="cover"><div>' +
     '<h1>' + W.title + '</h1><div class="sub">' + W.subtitle + ' · ' + fmtKm(TOTAL) + ' · leave ' + fmtOffset(0) + ', due ' + fmtOffset(W.milestones[W.milestones.length-1].offset) + ' (' + W.bufferMin + ' min buffer' + (W.deadline ? ' — be there by ' + fmtClock(W.deadline) : ' → ' + fmtOffset(W.milestones[W.milestones.length-1].offset + W.bufferMin)) + ')</div>' +
     '<table><tr><th>#</th><th>Milestone</th><th>Arrive</th><th>Break</th><th>Walked</th><th>Sheet</th></tr>' + rows + '</table>' +
-    '<div class="legend"><span><i class="sw" style="background:#e8590c"></i>the route</span><span><i class="sw" style="background:#7c3aed;border-top:1px dashed #fff"></i>joined by hand</span><span><i class="sw" style="background:#4b5563"></i>optional: campsite to school</span><span><span class="poi" style="display:inline-flex;vertical-align:middle">' + (SVG.toilet) + '</span> toilets</span><span>Times are planned arrivals, before any break. Map: LINZ Topo50 / OpenStreetMap. ' + cells.length + ' sheets at 1:' + scale.toLocaleString() + ', A4 landscape, north up. Fold on the dashed line; sheets then butt together.</span></div>' +
+    '<div class="legend"><span><i class="sw" style="background:#e8590c"></i>the route</span><span><i class="sw" style="background:#7c3aed;border-top:1px dashed #fff"></i>joined by hand</span><span><i class="sw" style="background:#4b5563"></i>optional: campsite to school</span><span><span class="poi" style="display:inline-flex;vertical-align:middle">' + (SVG.toilet) + '</span> toilets</span><span>Times are planned arrivals, before any break. Map: OpenStreetMap / LINZ Topo50. ' + cells.length + ' sheets at 1:' + scale.toLocaleString() + ', A4 landscape, north up. Fold on the dashed line; sheets then butt together.</span></div>' +
     '</div><div class="ov"><div class="map" id="ovmap"></div></div></div>';
   $('pages').appendChild(cover);
   const ov = L.map('ovmap', {zoomControl:false, attributionControl:true, zoomSnap:0, zoomDelta:.25});
