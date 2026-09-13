@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="__SHORT_TITLE__">
+<meta name="theme-color" content="#1f2a37">
+<title>__TITLE__</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<style>
+/*__LEAFLET_CSS__*/
+</style>
+<style>
+:root{
+  --bg:#1f2a37; --panel:#ffffff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+  --route:#e8590c; --route-done:#9a6b4c; --bridge:#7c3aed; --accent:#0b6bcb;
+  --ok:#15803d; --warn:#b45309; --bad:#b91c1c;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);-webkit-text-size-adjust:100%}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+header{background:var(--bg);color:#fff;padding:calc(var(--sat) + 8px) 12px 8px;display:flex;align-items:center;gap:10px;flex:0 0 auto}
+header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}
+#clock{font-variant-numeric:tabular-nums;font-size:15px;opacity:.9}
+#buffer{border-radius:999px;padding:4px 10px;font-weight:700;font-size:14px;background:#374151;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}
+#buffer.ok{background:var(--ok)} #buffer.warn{background:var(--warn)} #buffer.bad{background:var(--bad)}
+#menuBtn{background:transparent;border:0;color:#fff;font-size:22px;padding:2px 6px;line-height:1}
+#map{flex:1 1 auto;min-height:120px;background:#dfe7d8}
+#banner{display:none;background:#fef3c7;color:#78350f;padding:6px 12px;font-size:14px;font-weight:600;text-align:center;flex:0 0 auto}
+#banner.show{display:block}
+#banner.bad{background:#fee2e2;color:#7f1d1d}
+#card{background:var(--panel);border-top-left-radius:16px;border-top-right-radius:16px;padding:10px 14px calc(var(--sab) + 10px);box-shadow:0 -4px 16px rgba(0,0,0,.25);flex:0 0 auto;max-height:52vh;overflow:auto}
+#card .grab{width:44px;height:5px;border-radius:3px;background:#cbd5e1;margin:0 auto 8px;cursor:pointer}
+#card .grabzone{margin:-10px -14px 0;padding:10px 14px 4px}
+.next-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.next-name{font-size:22px;font-weight:800;margin:2px 0 4px;line-height:1.2}
+#card.collapsed .next-meta,#card.collapsed .notes,#card.collapsed .gps,#card.collapsed .btns,#card.collapsed #strip{display:none}
+#card.collapsed{padding-bottom:calc(var(--sab) + 8px)}
+#strip{position:relative;height:14px;margin:2px 0 8px}
+#strip .bar{position:absolute;left:0;right:0;top:5px;height:4px;border-radius:2px;background:#e5e7eb}
+#strip .fill{position:absolute;left:0;top:5px;height:4px;border-radius:2px;background:var(--route);width:0}
+#strip .dot{position:absolute;top:2px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #cbd5e1;margin-left:-5px}
+#strip .dot.done{background:#cbd5e1;border-color:#cbd5e1}
+#strip .dot.checked{background:#15803d;border-color:#15803d}
+#strip .dot.brk{border-color:#15803d}
+#strip .you{position:absolute;top:-1px;width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4);margin-left:-8px;display:none}
+.striplbl{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin-top:-2px}
+.next-meta{font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+.next-meta b{font-weight:700}
+.notes{margin-top:6px;font-size:14px;color:#374151;line-height:1.35}
+.notes .tag{display:inline-block;background:#f3f4f6;border-radius:6px;padding:2px 7px;margin:2px 4px 2px 0;font-size:13px}
+.notes .tag.leg{background:#fff7ed;color:#7c2d12}
+.notes .tag.brk{background:#ecfdf5;color:#065f46}
+.gps{font-size:12px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+.btns{display:flex;gap:8px;margin-top:10px}
+button.big{flex:1 1 auto;border:0;border-radius:12px;padding:13px 10px;font-size:16px;font-weight:700;color:#fff;background:var(--accent);-webkit-tap-highlight-color:transparent}
+button.big.start{background:var(--ok);font-size:18px}
+button.big.wa{background:#25d366}
+button.big.ghost{background:#eef2f7;color:var(--ink)}
+button.big:active{filter:brightness(.9)}
+/* map controls */
+.ctl{position:absolute;right:10px;z-index:800;display:flex;flex-direction:column;gap:8px}
+.ctl button{width:42px;height:42px;border-radius:10px;border:0;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35);font-size:20px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.ctl button.on{background:var(--accent);color:#fff}
+/* markers */
+.ms{width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--route);color:#111;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.ms.done{background:#e5e7eb;border-color:#9ca3af;color:#6b7280}
+.ms.checked{background:#15803d;border-color:#fff;color:#fff}
+.ms.next{background:var(--route);border-color:#fff;color:#fff;transform:scale(1.25)}
+.ms.finish{background:#111;border-color:#fff;color:#fff}
+.ms.finish svg{width:16px;height:16px;fill:#fff}
+.poi{width:24px;height:24px;border-radius:6px;background:#fff;border:2px solid #0891b2;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.poi svg{width:16px;height:16px}
+.lm{width:26px;height:26px;border-radius:6px;background:#fff;border:2px solid #4b5563;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.lm svg{width:18px;height:18px}
+.me{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 0 0 2px rgba(11,107,203,.4),0 1px 4px rgba(0,0,0,.5)}
+.me.stale{background:#9ca3af;box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+.leaflet-tooltip.lbl{background:rgba(255,255,255,.92);border:0;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.leaflet-tooltip.lbl::before{display:none}
+.leaflet-container{font-family:inherit}
+.leaflet-control-attribution{font-size:9px}
+/* sheets */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:none;align-items:flex-end}
+.sheet.show{display:flex}
+.sheet .inner{background:#fff;width:100%;max-height:85vh;overflow:auto;border-top-left-radius:16px;border-top-right-radius:16px;padding:12px 14px calc(var(--sab) + 12px)}
+.sheet h2{margin:4px 0 10px;font-size:18px}
+.sheet .close{float:right;border:0;background:#f3f4f6;border-radius:8px;padding:6px 10px;font-weight:700}
+table.tt{width:100%;border-collapse:collapse;font-size:14px}
+table.tt td{padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tt tr.done td{color:#9ca3af}
+table.tt tr.checked td.n{color:#15803d}
+table.tt tr.next td{background:#fff7ed}
+table.tt td.n{width:26px;font-weight:800;color:var(--route)}
+table.tt td.t{white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
+table.tt .sub{display:block;font-size:12px;color:var(--muted)}
+
+.menu button{display:block;width:100%;text-align:left;border:0;background:#f9fafb;border-radius:10px;padding:12px;font-size:15px;margin-bottom:8px;font-weight:600}
+.menu .hint{font-size:13px;color:var(--muted);margin:-4px 0 10px 4px;line-height:1.35}
+#progress{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin:6px 0}
+#progress div{height:100%;background:var(--accent);width:0}
+#toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 52px);background:#111;color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;z-index:3000;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:.95}
+#sim{display:none;background:#111;color:#fff;padding:6px 10px;font-size:12px;gap:8px;align-items:center;flex:0 0 auto}
+#sim.show{display:flex}
+#sim input[type=range]{flex:1}
+.leaflet-bar a{width:30px;height:30px;line-height:30px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="title">__TITLE__</h1>
+    <span id="clock">--:--</span>
+    <span id="buffer">not started</span>
+    <button id="menuBtn" aria-label="menu">☰</button>
+  </header>
+  <div id="banner"></div>
+  <div id="sim"><span>SIM</span><input type="range" id="simRange" min="0" max="1000" value="0"><button id="simPlay">▶</button><span id="simInfo"></span></div>
+  <div id="map"></div>
+  <div id="card">
+    <div class="grabzone" id="grabzone"><div class="grab"></div></div>
+    <div id="strip"><div class="bar"></div><div class="fill" id="stripFill"></div><div id="stripDots"></div><div class="you" id="stripYou"></div></div>
+    <div class="striplbl" id="stripLbl"><span>start</span><span></span></div>
+    <div class="next-label" id="nextLabel">Next</div>
+    <div class="next-name" id="nextName">—</div>
+    <div class="next-meta" id="nextMeta">—</div>
+    <div class="notes" id="notes"></div>
+    <div class="gps" id="gps">Waiting for GPS…</div>
+    <div class="btns" id="btns"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<div class="sheet" id="listSheet"><div class="inner">
+  <button class="close" data-close="listSheet">Close</button>
+  <h2>Milestones</h2>
+  <div id="listBody"></div>
+</div></div>
+
+<div class="sheet" id="menuSheet"><div class="inner menu">
+  <button class="close" data-close="menuSheet">Close</button>
+  <h2 id="menuTitle">__TITLE__</h2>
+  <button id="btnOffline">Save map for offline</button>
+  <div class="hint" id="offlineHint">Do this at home on wifi. It stores the Topo50 map tiles along the whole route on this phone, so the map still shows where there's no signal (switch to Map: Topo when you lose signal; the app also does this itself if the street tiles stop loading).</div>
+  <div id="progress"><div></div></div>
+  <button id="btnLayer">Map: Topo</button>
+  <div class="hint">Streets (OpenStreetMap), NZ Topo50 (tracks, contours — this is the one saved offline), Satellite (LINZ aerial), OpenTopo. The wiggly-line button on the map hides or shows the route.</div>
+  <button id="btnFollow">Follow me: on</button>
+  <button id="btnPrint">Printable map sheets</button>
+  <button id="btnPoster">Whole route on one page</button>
+  <button id="btnCheckin2">Send a check-in</button>
+  <button id="btnResetStart">Reset the start (undo the Start button)</button>
+  <div class="hint" id="tileInfo"></div>
+  <div class="hint" id="about"></div>
+</div></div>
+
+<script src="data.js"></script>
+<script>
+/*__LEAFLET_JS__*/
+</script>
+<script>
+(function(){
+'use strict';
+const W = window.WALK;
+const LINZ_KEY = '__LINZ_KEY__';
+const $ = (id) => document.getElementById(id);
+const STORE = 'walk:' + W.slug + ':';
+const R = 6371008.8;
+
+// ---------- geometry ----------
+function hav(a, b){ // [lat,lng]
+  const p1 = a[0]*Math.PI/180, p2 = b[0]*Math.PI/180, dp = (b[0]-a[0])*Math.PI/180, dl = (b[1]-a[1])*Math.PI/180;
+  const h = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+const lat0 = W.route[0][0]*Math.PI/180;
+const KX = R*Math.cos(lat0)*Math.PI/180, KY = R*Math.PI/180;
+const toXY = (ll) => [ll[1]*KX, ll[0]*KY];
+const XY = W.route.map(toXY);
+const CUM = [0];
+for (let i=1;i<XY.length;i++) CUM.push(CUM[i-1] + Math.hypot(XY[i][0]-XY[i-1][0], XY[i][1]-XY[i-1][1]));
+const TOTAL = CUM[CUM.length-1];
+const MS = W.milestones;
+const FINAL = MS[MS.length-1];
+
+function projectAll(p){ // returns array of local minima {d, along}
+  const out = [];
+  let prev = null;
+  for (let i=0;i<XY.length-1;i++){
+    const a = XY[i], b = XY[i+1];
+    const dx=b[0]-a[0], dy=b[1]-a[1], L2=dx*dx+dy*dy;
+    let t = L2 ? ((p[0]-a[0])*dx + (p[1]-a[1])*dy)/L2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    const qx=a[0]+t*dx, qy=a[1]+t*dy;
+    const d = Math.hypot(p[0]-qx, p[1]-qy);
+    const along = CUM[i] + t*(CUM[i+1]-CUM[i]);
+    if (prev && d > prev.d && !prev.emitted){ out.push(prev); prev.emitted = true; }
+    if (!prev || d < prev.d || prev.emitted) prev = {d, along, emitted:false};
+    else prev = {d, along, emitted:false, rising:true};
+  }
+  if (prev && !prev.emitted) out.push(prev);
+  return out;
+}
+let lastAlong = null;
+function progressFor(p){
+  const cands = projectAll(p);
+  let best = null;
+  for (const c of cands){
+    let score = c.d;
+    if (lastAlong !== null){
+      const back = lastAlong - c.along;
+      if (back > 150) score += (back - 150) * 0.5;           // going backwards a long way is unlikely
+      const fwd = c.along - lastAlong;
+      if (fwd > 2500) score += (fwd - 2500) * 0.2;           // jumping far forward is unlikely
+    }
+    if (!best || score < best.score) best = Object.assign({score}, c);
+  }
+  return best;
+}
+function pointAt(along){
+  if (along <= 0) return W.route[0];
+  if (along >= TOTAL) return W.route[W.route.length-1];
+  let lo=0, hi=CUM.length-1;
+  while (hi-lo>1){ const m=(lo+hi)>>1; if (CUM[m] <= along) lo=m; else hi=m; }
+  const t = (along-CUM[lo])/((CUM[hi]-CUM[lo])||1);
+  return [W.route[lo][0] + t*(W.route[hi][0]-W.route[lo][0]), W.route[lo][1] + t*(W.route[hi][1]-W.route[lo][1])];
+}
+
+// ---------- state ----------
+const state = {
+  startAt: +localStorage.getItem(STORE+'startAt') || null,
+  checked: JSON.parse(localStorage.getItem(STORE+'checked') || '[]'),     // milestones she checked in at (within 60 m)
+  announced: JSON.parse(localStorage.getItem(STORE+'announced') || '[]'), // milestones already toasted as passed
+  pos: null, acc: null, posAt: null,
+  along: null, off: null,
+  follow: true, layer: localStorage.getItem(STORE+'layer') || 'osm', routeOn: localStorage.getItem(STORE+'route') !== 'off',
+  sim: /[?&]sim/.test(location.search),
+};
+const save = () => { localStorage.setItem(STORE+'startAt', state.startAt || ''); localStorage.setItem(STORE+'checked', JSON.stringify(state.checked)); localStorage.setItem(STORE+'announced', JSON.stringify(state.announced)); };
+const clearWalk = () => { state.startAt = null; state.checked = []; state.announced = []; save(); };
+let staleCleared = false;
+if (state.startAt && Date.now() - state.startAt > 20*3600*1000){ clearWalk(); staleCleared = true; }
+
+const [nh, nm] = W.nominalStart.split(':').map(Number);
+function plannedStartToday(){ const d = new Date(); d.setHours(nh, nm, 0, 0); return d.getTime(); }
+function baseStart(){ return state.startAt || plannedStartToday(); }
+function timeAtOffset(min){ return new Date(baseStart() + min*60000); }
+function deadlineTime(){
+  if (W.deadline){ const [h, m] = W.deadline.split(':').map(Number); const d = new Date(baseStart()); d.setHours(h, m, 0, 0); return d.getTime(); }
+  return baseStart() + (FINAL.offset + W.bufferMin)*60000;
+}
+function fmt(d){ let h=d.getHours(), m=d.getMinutes(); const ap = h>=12?'pm':'am'; h = h%12||12; return h + ':' + String(m).padStart(2,'0') + ap; }
+function fmtKm(m){ return m < 950 ? Math.round(m/10)*10 + ' m' : (m/1000).toFixed(m<10000?1:0) + ' km'; }
+function fmtMin(m){ m = Math.round(m); if (Math.abs(m) < 60) return m + ' min'; const h=Math.floor(Math.abs(m)/60), r=Math.abs(m)%60; return (m<0?'-':'') + h + 'h' + (r?String(r).padStart(2,'0'):''); }
+
+// expected minutes since start for a position `along` metres in, honouring breaks
+function expectedElapsed(along, nearIdx, actualMin){
+  let i = 0;
+  while (i < MS.length-1 && MS[i+1].along <= along) i++;
+  const a = MS[i], b = MS[i+1];
+  if (nearIdx !== null && nearIdx !== undefined){
+    const m = MS[nearIdx];
+    if (m.break && actualMin !== undefined){
+      // sitting at a milestone with a break: not late until the break is over
+      return Math.min(Math.max(actualMin, m.offset), m.offset + m.break);
+    }
+  }
+  if (!b) return a.offset + a.break;
+  const legStart = a.offset + a.break, legMin = b.offset - legStart;
+  const frac = (along - a.along) / Math.max(1, b.along - a.along);
+  return legStart + Math.max(0, Math.min(1, frac)) * legMin;
+}
+
+// ---------- map ----------
+const map = L.map('map', {zoomControl:false, attributionControl:true, tap:false});
+L.control.zoom({position:'topleft'}).addTo(map);
+const layers = {
+  topo: L.tileLayer('https://tiles-{s}.data-cdn.linz.govt.nz/services;key=' + LINZ_KEY + '/tiles/v4/layer=50767/EPSG:3857/{z}/{x}/{y}.png',
+    {maxNativeZoom:16, maxZoom:18, subdomains:'abcd', crossOrigin:'anonymous', attribution:'Topo50 © <a href="https://www.linz.govt.nz/">LINZ</a> CC BY 4.0', errorTileUrl:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='}),
+  topoPlain: L.tileLayer('https://tiles-{s}.data-cdn.linz.govt.nz/services;key=' + LINZ_KEY + '/tiles/v4/layer=50767/EPSG:3857/{z}/{x}/{y}.png',
+    {maxNativeZoom:16, maxZoom:18, subdomains:'abcd', attribution:'Topo50 © <a href="https://www.linz.govt.nz/">LINZ</a> CC BY 4.0', errorTileUrl:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='}),
+  sat: L.tileLayer('https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp',
+    {maxNativeZoom:19, maxZoom:20, crossOrigin:'anonymous', attribution:'Aerial © <a href="https://www.linz.govt.nz/">LINZ</a> CC BY 4.0'}),
+  satEsri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {maxNativeZoom:18, maxZoom:20, crossOrigin:'anonymous', attribution:'Imagery © Esri, Maxar, Earthstar Geographics'}),
+  osm: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, crossOrigin:'anonymous', attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}),
+  otm: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {maxNativeZoom:16, maxZoom:18, subdomains:'abc', crossOrigin:'anonymous', attribution:'© OpenStreetMap, SRTM | © <a href="https://opentopomap.org">OpenTopoMap</a> CC BY-SA'}),
+};
+const layerNames = {topo:'Topo', topoPlain:'Topo (no offline)', osm:'Streets', otm:'OpenTopo', sat:'Satellite', satEsri:'Satellite (Esri)'};
+const layerOrder = ['topo','topoPlain','osm','otm','sat','satEsri'];   // fallback order when a layer's tiles won't load
+const layerCycle = ['osm','topo','sat','otm'];                         // what the menu button cycles through
+let curLayer = null;
+const tileStats = {ok:0, err:0};
+function setLayer(name){
+  if (curLayer) map.removeLayer(layers[curLayer]);
+  curLayer = name; tileStats.ok = 0; tileStats.err = 0;
+  layers[name].addTo(map);
+  $('btnLayer').textContent = 'Map: ' + layerNames[name];
+  localStorage.setItem(STORE+'layer', name);
+}
+for (const k of layerOrder){
+  layers[k].on('tileload', (e) => { if (!(e.tile && /^data:/.test(e.tile.getAttribute('src') || ''))){ tileStats.ok++; tileStats.hops = 0; } });   // the blank error tile also fires tileload
+  layers[k].on('tileerror', () => {
+    tileStats.err++;
+    if (k === curLayer && tileStats.ok === 0 && tileStats.err >= 6 && (tileStats.hops || 0) < layerOrder.length){
+      // this layer is dead (no key, no signal, blocked): try the next one, at most once round the list
+      const next = layerOrder[(layerOrder.indexOf(k)+1) % layerOrder.length];
+      const hops = (tileStats.hops || 0) + 1;
+      toast(layerNames[k] + ' map tiles are not loading — trying ' + layerNames[next], 6000);
+      setLayer(next); tileStats.hops = hops;
+    }
+  });
+}
+setLayer(state.layer);
+
+// route
+const routeLatLngs = W.route;
+const routeGroup = L.layerGroup().addTo(map);   // everything that can be hidden with the route button
+L.polyline(routeLatLngs, {color:'#fff', weight:7, opacity:.45, lineCap:'round', lineJoin:'round', interactive:false}).addTo(routeGroup);
+const routeLine = L.polyline(routeLatLngs, {color:'#e8590c', weight:4, opacity:.55, lineCap:'round', lineJoin:'round', interactive:false}).addTo(routeGroup);
+const doneLine = L.polyline([], {color:'#9a6b4c', weight:4, opacity:.5, lineCap:'round', lineJoin:'round', interactive:false}).addTo(routeGroup);
+for (const [i,j] of W.bridges){
+  L.polyline([routeLatLngs[i], routeLatLngs[j]], {color:'#7c3aed', weight:4, dashArray:'6 6', opacity:.7}).addTo(routeGroup)
+   .bindTooltip('joined by hand — check on the ground', {className:'lbl'});
+}
+for (const ex of W.extras){
+  L.polyline(ex.coords, {color:'#4b5563', weight:3, dashArray:'4 8', opacity:.7}).addTo(routeGroup).bindTooltip(ex.label, {className:'lbl'});
+}
+function setRoute(on){
+  state.routeOn = on; localStorage.setItem(STORE+'route', on ? 'on' : 'off');
+  if (on){ if (!map.hasLayer(routeGroup)) routeGroup.addTo(map); } else map.removeLayer(routeGroup);
+  const b = $('cRoute'); if (b) b.classList.toggle('on', on);
+}
+const SVG = {
+  toilet: '<svg viewBox="0 0 24 24" fill="#0e7490"><circle cx="8" cy="4.5" r="2"/><path d="M6 8h4v6H9v7H7v-7H6z"/><circle cx="16.5" cy="4.5" r="2"/><path d="M14 8h5l1.5 7h-1.8l1 6h-4.4l1-6h-1.8z"/></svg>',
+  view: '<svg viewBox="0 0 24 24" fill="#0e7490"><path d="M12 5C6.5 5 2.5 12 2.5 12s4 7 9.5 7 9.5-7 9.5-7-4-7-9.5-7zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z"/></svg>',
+  school: '<svg viewBox="0 0 24 24" fill="#374151"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zm-7 9.6V17c0 1.7 3.1 3 7 3s7-1.3 7-3v-4.4l-7 3.8-7-3.8z"/></svg>',
+  tent: '<svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zm0 5 5.5 9.5h-3L12 13l-2.5 4.5h-3L12 8z"/></svg>',
+};
+const msMarkers = MS.map((m, i) => {
+  const html = m.finish ? SVG.tent : String(i);
+  const mk = L.marker([m.lat, m.lng], {icon: L.divIcon({className:'', html:'<div class="ms' + (m.finish?' finish':'') + '" data-i="'+i+'">' + html + '</div>', iconSize:[26,26], iconAnchor:[13,13]}), zIndexOffset: 500});
+  mk.bindTooltip(m.label + ' · ' + fmt(timeAtOffset(m.offset)), {className:'lbl', direction:'top', offset:[0,-12]});
+  mk.on('click', () => showMilestone(i));
+  return mk.addTo(map);
+});
+for (const lm of W.landmarks){
+  L.marker([lm.lat, lm.lng], {icon: L.divIcon({className:'', html:'<div class="lm">' + (SVG[lm.kind] || '') + '</div>', iconSize:[26,26], iconAnchor:[13,13]})}).addTo(map)
+    .bindTooltip(lm.label, {className:'lbl', direction:'top', offset:[0,-12]});
+}
+for (const p of W.pois){
+  L.marker([p.lat, p.lng], {icon: L.divIcon({className:'', html:'<div class="poi">' + (SVG[p.kind] || '') + '</div>', iconSize:[24,24], iconAnchor:[12,12]})}).addTo(map)
+    .bindTooltip(p.label, {className:'lbl', direction:'top', offset:[0,-12]});
+}
+const meMarker = L.marker(routeLatLngs[0], {icon: L.divIcon({className:'', html:'<div class="me" id="meDot"></div>', iconSize:[18,18], iconAnchor:[9,9]}), zIndexOffset: 1000, interactive:false});
+const accCircle = L.circle(routeLatLngs[0], {radius:0, color:'#0b6bcb', weight:1, fillOpacity:.08, interactive:false});
+map.fitBounds(routeLine.getBounds(), {padding:[20,20]});
+if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize({pan:false})).observe($('map'));
+map.on('dragstart', () => { if (state.follow) setFollow(false); });
+
+// custom controls
+const ctl = document.createElement('div'); ctl.className = 'ctl'; ctl.style.bottom = '30px';
+ctl.innerHTML = '<button id="cRoute" title="Show or hide the route line"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c3-7 6-9 8-7s4 4 8-7"/></svg></button><button id="cFollow" title="Follow me">◎</button><button id="cAll" title="Whole route">⤢</button>';
+$('map').appendChild(ctl);
+$('cFollow').onclick = () => { setFollow(true); if (state.pos) map.setView(state.pos, Math.max(map.getZoom(), 15)); };
+$('cRoute').onclick = () => setRoute(!state.routeOn);
+setRoute(state.routeOn);
+$('cAll').onclick = () => { setFollow(false); map.fitBounds(routeLine.getBounds(), {padding:[20,20]}); };
+function setFollow(on){ state.follow = on; $('cFollow').classList.toggle('on', on); $('btnFollow').textContent = 'Follow me: ' + (on?'on':'off'); }
+setFollow(true);
+
+// ---------- GPS ----------
+let watchId = null;
+function startGPS(){
+  if (state.sim) return;
+  if (!('geolocation' in navigator)){ $('gps').textContent = 'No GPS available in this browser.'; return; }
+  watchId = navigator.geolocation.watchPosition(onPos, onPosErr, {enableHighAccuracy:true, maximumAge:5000, timeout:30000});
+}
+function onPosErr(e){
+  $('gps').textContent = e.code === 1 ? 'Location is blocked. Allow location for this page in Settings › Safari (or Chrome) › Location.' : 'Waiting for GPS… (' + e.message + ')';
+}
+function onPos(p){ handlePosition([p.coords.latitude, p.coords.longitude], p.coords.accuracy, p.timestamp); }
+function handlePosition(latlng, acc, ts){
+  state.pos = latlng; state.acc = acc; state.posAt = ts || Date.now();
+  if (!map.hasLayer(meMarker)){ meMarker.addTo(map); accCircle.addTo(map); }
+  meMarker.setLatLng(latlng); accCircle.setLatLng(latlng); accCircle.setRadius(acc || 0);
+  const pr = progressFor(toXY(latlng));
+  state.along = pr.along; state.off = pr.d; lastAlong = pr.along;
+  if (!state.startAt && pr.d < 120 && state.along > 250 && state.along < 3000 && Math.abs(Date.now() - plannedStartToday()) < 90*60000){
+    // she's walking and forgot to press Start: assume she's on plan right now
+    state.startAt = Date.now() - expectedElapsed(state.along, null)*60000; state.checked = []; state.announced = []; save(); refreshTooltips();
+    toast('Started automatically — start time set to ' + fmt(new Date(state.startAt)), 6000);
+  }
+  if (state.startAt && pr.d < 150){
+    // a quiet note as she passes each milestone; ticks only come from check-ins
+    const p = passedIndex();
+    for (let i=1;i<=p;i++){
+      if (state.announced.includes(i)) continue;
+      state.announced.push(i); save();
+      if (i === p) toast(MS[i].finish ? 'You made it: ' + MS[i].label + '!' : (hav(latlng, [MS[i].lat, MS[i].lng]) < 60 ? "You're at " : 'Passing ') + i + ' ' + MS[i].label, 4000);
+    }
+  }
+  if (state.follow) map.setView(latlng, Math.max(map.getZoom(), 15), {animate:true});
+  render();
+}
+
+// ---------- rendering ----------
+function passedIndex(){
+  // the last milestone she is at or beyond, from her position along the route; without GPS, the last one she checked in at
+  if (state.along !== null){
+    let p = 0;
+    for (let i=1;i<MS.length;i++){ if (state.along >= MS[i].along - 30 || (state.pos && hav(state.pos, [MS[i].lat, MS[i].lng]) < 60)) p = i; }
+    return p;
+  }
+  return state.checked.length ? Math.max(...state.checked) : 0;
+}
+function nextIndex(){
+  const p = passedIndex();
+  return p >= MS.length - 1 ? null : p + 1;
+}
+function nearIndex(){
+  // the milestone she is standing at (within 60 m); where two share a spot (a loop back to the start),
+  // take the one that fits her progress along the route
+  if (!state.pos) return null;
+  const near = [];
+  MS.forEach((m,i) => { if (hav(state.pos, [m.lat,m.lng]) < 60) near.push(i); });
+  if (!near.length) return null;
+  if (state.along === null) return near[near.length-1];
+  let best = near[0], bd = 1e9;
+  for (const i of near){ const d = Math.abs(MS[i].along - state.along); if (d < bd){ bd = d; best = i; } }
+  return best;
+}
+function bufferInfo(){
+  if (!state.startAt || state.along === null) return null;
+  const actual = (Date.now() - state.startAt)/60000;
+  const exp = expectedElapsed(state.along, nearIndex(), actual);
+  const behind = actual - exp;
+  const finishEta = new Date(Date.now() + (FINAL.offset - exp)*60000);
+  const buffer = (deadlineTime() - finishEta.getTime())/60000;   // minutes in hand against the deadline
+  return {actual, exp, behind, buffer, finishEta};
+}
+function bufferPhrase(b){
+  if (b >= W.bufferMin + 15) return 'ahead of plan, nice';
+  if (b >= W.bufferMin - 5) return 'cruising';
+  if (b >= W.bufferMin*0.6) return 'nicely on track';
+  if (b >= W.bufferMin*0.3) return 'fine — keep it steady';
+  if (b >= 5) return 'keep moving';
+  if (b >= 0) return 'buffer nearly gone';
+  return 'past the deadline by ' + fmtMin(-b) + ' at this pace';
+}
+function render(){
+  const now = new Date();
+  $('clock').textContent = fmt(now);
+  const bi = bufferInfo();
+  const bEl = $('buffer');
+  bEl.className = '';
+  if (!state.startAt){ bEl.textContent = 'plan: leave ' + fmt(timeAtOffset(0)); }
+  else if (!bi){ bEl.textContent = 'started ' + fmt(new Date(state.startAt)); }
+  else {
+    bEl.textContent = 'buffer ' + fmtMin(bi.buffer);
+    bEl.classList.add(bi.buffer >= W.bufferMin*0.3 ? 'ok' : bi.buffer >= 5 ? 'warn' : 'bad');
+  }
+  const ni = nextIndex();
+  const nearI = nearIndex();
+  const pIdx = passedIndex();
+  const done = ni === null;
+  let label, name, meta = '', notes = '';
+  if (done){
+    label = 'Finished'; name = FINAL.label;
+    meta = 'You did it — ' + fmtKm(TOTAL) + ' on foot' + (state.startAt ? ', started ' + fmt(new Date(state.startAt)) : '') + '.';
+  } else {
+    const m = MS[ni];
+    const prev = MS[ni-1];
+    label = 'Next stop · ' + ni + ' of ' + (MS.length-1);
+    name = m.label;
+    const due = timeAtOffset(m.offset);
+    let parts = [];
+    if (state.along !== null){
+      const rem = Math.max(0, m.along - state.along);
+      parts.push('<b>' + fmtKm(rem) + '</b> to go');
+    } else {
+      parts.push(fmtKm(m.along - prev.along) + ' leg');
+    }
+    parts.push('due <b>' + fmt(due) + '</b>');
+    if (bi){
+      parts.push(bufferPhrase(bi.buffer));
+    }
+    meta = parts.join(' · ');
+    const tags = [];
+    if (nearI !== null && MS[nearI].break && state.startAt && nearI === ni - 1){
+      tags.push('<span class="tag brk">You\'re at ' + MS[nearI].label + ': ' + MS[nearI].break + ' min break' + (MS[nearI].note ? ' — ' + MS[nearI].note : '') + '. Plan says leave by ' + fmt(timeAtOffset(MS[nearI].offset + MS[nearI].break)) + '</span>');
+    }
+    if (m.legNote) tags.push('<span class="tag leg">this leg: ' + m.legNote + '</span>');
+    if (m.break) tags.push('<span class="tag brk">' + m.break + ' min break there' + (m.note ? ' — ' + m.note : '') + '</span>');
+    else if (m.note) tags.push('<span class="tag">' + m.note + '</span>');
+    if (bi && ni < MS.length){
+      tags.push('<span class="tag">' + FINAL.label + ' ETA <b>' + fmt(bi.finishEta) + '</b> · plan ' + fmt(timeAtOffset(FINAL.offset)) + ' · be there by ' + fmt(new Date(deadlineTime())) + '</span>');
+    }
+    notes = tags.join('');
+  }
+  $('nextLabel').textContent = label; $('nextName').textContent = name; $('nextMeta').innerHTML = meta; $('notes').innerHTML = notes;
+  // gps line
+  if (state.pos){
+    const age = (Date.now() - state.posAt)/1000;
+    $('gps').textContent = 'GPS ±' + Math.round(state.acc||0) + ' m' + (age > 60 ? ' · last fix ' + Math.round(age/60) + ' min ago' : '') + (state.along !== null ? ' · ' + fmtKm(state.along) + ' of ' + fmtKm(TOTAL) + ' walked' : '');
+    const dot = $('meDot'); if (dot) dot.classList.toggle('stale', age > 90);
+  }
+  // off route banner
+  const ban = $('banner');
+  if (state.pos && state.off !== null && state.off > 150 && (state.acc||0) < 100){
+    ban.textContent = 'You are about ' + fmtKm(state.off) + ' from the route'; ban.className = 'show' + (state.off > 400 ? ' bad' : '');
+  } else ban.className = '';
+  // done line
+  if (state.along !== null){
+    const pts = []; let i = 0;
+    while (i < CUM.length && CUM[i] <= state.along){ pts.push(routeLatLngs[i]); i++; }
+    pts.push(pointAt(state.along));
+    doneLine.setLatLngs(pts);
+  }
+  // marker classes
+  msMarkers.forEach((mk, i) => {
+    const el = mk.getElement(); if (!el) return;
+    const d = el.querySelector('.ms'); if (!d) return;
+    d.classList.toggle('done', i <= pIdx && !state.checked.includes(i) && !MS[i].finish);
+    d.classList.toggle('checked', state.checked.includes(i));
+    d.classList.toggle('next', i === ni);
+    mk.setZIndexOffset(i === ni ? 900 : 500);
+  });
+  // journey strip
+  const dotsEl = $('stripDots');
+  if (!dotsEl.childElementCount){
+    MS.forEach((m, i) => { const d = document.createElement('div'); d.className = 'dot' + (m.break ? ' brk' : ''); d.style.left = (100*m.along/TOTAL) + '%'; d.title = m.label; dotsEl.appendChild(d); });
+    $('stripLbl').lastElementChild.textContent = FINAL.label + ' · ' + fmtKm(TOTAL);
+  }
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => { d.classList.toggle('done', i <= pIdx && !state.checked.includes(i)); d.classList.toggle('checked', state.checked.includes(i)); });
+  if (state.along !== null){ $('stripFill').style.width = (100*state.along/TOTAL) + '%'; const y = $('stripYou'); y.style.display = 'block'; y.style.left = (100*state.along/TOTAL) + '%'; }
+  // buttons
+  const b = $('btns');
+  if (!state.startAt){
+    b.innerHTML = '<button class="big start" id="btnStart">Start the walk</button><button class="big ghost" id="btnList">List</button>';
+    $('btnStart').onclick = () => { state.startAt = Date.now(); state.checked = (state.pos && hav(state.pos, [MS[0].lat, MS[0].lng]) < 60) ? [0] : []; state.announced = []; save(); toast('Started ' + fmt(new Date()) + '. Go well!'); refreshTooltips(); render(); };
+  } else {
+    b.innerHTML = '<button class="big wa" id="btnCheckin">Check in</button><button class="big ghost" id="btnList">Milestones</button>';
+    $('btnCheckin').onclick = checkIn;
+  }
+  $('btnList').onclick = () => { renderList(); $('listSheet').classList.add('show'); };
+}
+function refreshTooltips(){
+  msMarkers.forEach((mk, i) => mk.setTooltipContent(MS[i].label + ' · ' + fmt(timeAtOffset(MS[i].offset))));
+}
+function renderList(){
+  const ni = nextIndex(), pIdx = passedIndex();
+  let h = '<table class="tt">';
+  MS.forEach((m, i) => {
+    const cls = state.checked.includes(i) ? 'checked' : (i <= pIdx ? 'done' : (i === ni ? 'next' : ''));
+    h += '<tr class="' + cls + '" data-i="' + i + '"><td class="n">' + (state.checked.includes(i) ? '✓' : (m.finish ? '⛺' : i)) + '</td><td>' + m.label +
+      (m.break ? '<span class="sub">' + m.break + ' min break' + (m.note ? ' — ' + m.note : '') + '</span>' : (m.note ? '<span class="sub">' + m.note + '</span>' : '')) +
+      (m.legNote ? '<span class="sub">leg: ' + m.legNote + '</span>' : '') +
+      '</td><td class="t">' + fmt(timeAtOffset(m.offset)) + '<span class="sub">' + fmtKm(m.along) + '</span></td></tr>';
+  });
+  h += '</table>';
+  $('listBody').innerHTML = h;
+  $('listBody').querySelectorAll('tr').forEach(tr => tr.onclick = () => { $('listSheet').classList.remove('show'); showMilestone(+tr.dataset.i); });
+}
+function showMilestone(i){
+  setFollow(false);
+  map.setView([MS[i].lat, MS[i].lng], Math.max(map.getZoom(), 16));
+  msMarkers[i].openTooltip();
+}
+
+// ---------- check-in ----------
+function checkIn(){
+  const parts = [W.title + ' check-in ' + fmt(new Date()) + '.'];
+  const nearI = nearIndex();
+  if (nearI !== null){
+    // a check-in within 60 m of a milestone is what ticks it
+    const m = MS[nearI];
+    parts.push('At ' + (m.finish ? '' : 'milestone ' + nearI + ', ') + m.label + (state.startAt ? ' (plan said ' + fmt(timeAtOffset(m.offset)) + ')' : '') + '.');
+    if (!state.checked.includes(nearI)){ state.checked.push(nearI); save(); toast('Checked in at ' + m.label + ' ✓', 4000); render(); }
+  } else if (state.along !== null){
+    const p = passedIndex(), n = nextIndex();
+    if (n === null) parts.push('Near the finish, ' + FINAL.label + '.');
+    else parts.push('Between ' + MS[p].label + ' and ' + MS[n].label + ': ' + fmtKm(Math.max(0, state.along - MS[p].along)) + ' past ' + MS[p].label + ', ' + fmtKm(Math.max(0, MS[n].along - state.along)) + ' to ' + MS[n].label + ' (due ' + fmt(timeAtOffset(MS[n].offset)) + ').');
+  }
+  const bi = bufferInfo();
+  if (bi) parts.push(FINAL.label + ' ETA ' + fmt(bi.finishEta) + ', buffer ' + fmtMin(bi.buffer) + '.');
+  if (state.pos) parts.push('I am here: https://maps.google.com/?q=' + state.pos[0].toFixed(5) + ',' + state.pos[1].toFixed(5) + (state.acc ? ' (±' + Math.round(state.acc) + ' m)' : ''));
+  else parts.push('(no GPS fix yet)');
+  const text = parts.join(' ');
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+$('btnCheckin2').onclick = () => { $('menuSheet').classList.remove('show'); checkIn(); };
+
+// ---------- menu ----------
+$('menuBtn').onclick = () => $('menuSheet').classList.add('show');
+$('grabzone').onclick = () => { $('card').classList.toggle('collapsed'); };
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => $(b.dataset.close).classList.remove('show'));
+document.querySelectorAll('.sheet').forEach(s => s.addEventListener('click', e => { if (e.target === s) s.classList.remove('show'); }));
+$('btnLayer').onclick = () => { const i = layerCycle.indexOf(curLayer); setLayer(layerCycle[(i+1) % layerCycle.length]); };
+$('btnFollow').onclick = () => setFollow(!state.follow);
+$('btnPrint').onclick = () => { location.href = 'print.html'; };
+$('btnPoster').onclick = () => { location.href = 'overview.html'; };
+$('btnResetStart').onclick = () => { if (confirm('Reset the start? Check-ins will be cleared too.')){ clearWalk(); refreshTooltips(); render(); $('menuSheet').classList.remove('show'); } };
+$('about').innerHTML = 'Route ' + fmtKm(TOTAL) + ' · ' + MS.length + ' milestones · plan ' + fmt(timeAtOffset(0)) + ' → ' + fmt(timeAtOffset(FINAL.offset)) + ' with a ' + W.bufferMin + ' min buffer' + (W.deadlineLabel ? ' (' + W.deadlineLabel + ')' : '') + '.<br>Map data © LINZ Topo50 (CC BY 4.0), © OpenStreetMap contributors.';
+
+function toast(msg, ms){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms || 3500); }
+
+// ---------- offline ----------
+function tileRange(z, pad){
+  // set of tiles the route passes through at zoom z, padded by `pad` tiles
+  const n = Math.pow(2, z), set = new Set();
+  const step = 40075016 / n / 4; // quarter tile spacing in metres, sample along route
+  for (let a = 0; a <= TOTAL; a += step){
+    const ll = pointAt(a);
+    const x = Math.floor((ll[1]+180)/360*n);
+    const latr = ll[0]*Math.PI/180;
+    const y = Math.floor((1 - Math.log(Math.tan(latr) + 1/Math.cos(latr))/Math.PI)/2*n);
+    for (let dx=-pad; dx<=pad; dx++) for (let dy=-pad; dy<=pad; dy++) set.add((x+dx) + '/' + (y+dy));
+  }
+  return [...set].map(s => { const [x,y] = s.split('/'); return {z, x:+x, y:+y}; });
+}
+function offlineTileList(){
+  const plan = [[11,1],[12,1],[13,1],[14,1],[15,2],[16,2]];   // z16 ±2 tiles ≈ 1.2 km either side of the line
+  let out = [];
+  for (const [z,pad] of plan) out = out.concat(tileRange(z, pad));
+  return out;
+}
+async function saveOffline(){
+  if (!('caches' in window)){ toast('This browser cannot store maps offline.'); return; }
+  const tiles = offlineTileList();
+  const urlOf = (t) => 'https://tiles-' + 'abcd'[Math.abs(t.x + t.y) % 4] + '.data-cdn.linz.govt.nz/services;key=' + LINZ_KEY + '/tiles/v4/layer=50767/EPSG:3857/' + t.z + '/' + t.x + '/' + t.y + '.png';   // same subdomain rule as Leaflet, so cached keys match
+  const btn = $('btnOffline'); btn.disabled = true;
+  const bar = $('progress').firstElementChild;
+  const cache = await caches.open('tiles-' + W.slug + '-v1');
+  let done = 0, failed = 0;
+  const queue = tiles.slice(), retry = [];
+  async function grab(u){
+    const hit = await cache.match(u);
+    if (hit) return;
+    const r = await fetch(u, {mode:'cors', cache:'no-store'});   // CORS so the stored copy is real bytes (opaque responses are padded to ~7 MB each in Chrome's quota)
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    await cache.put(u, r);
+  }
+  async function worker(){
+    while (queue.length){
+      const t = queue.shift(); const u = urlOf(t);
+      try { await grab(u); } catch(e){ retry.push(u); }
+      done++;
+      if (done % 5 === 0 || done === tiles.length){ bar.style.width = (100*done/tiles.length) + '%'; btn.textContent = 'Saving map… ' + done + ' / ' + tiles.length; }
+    }
+  }
+  await Promise.all([worker(), worker(), worker()]);
+  for (const u of retry){ try { await grab(u); } catch(e){ failed++; console.warn('tile failed', u, e); } }
+  // also refresh the app shell cache
+  try { const c2 = await caches.open('shell-' + W.slug + '-v1'); await c2.addAll(['./', 'index.html', 'data.js', 'print.html', 'overview.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-32.png']); } catch(e){}
+  btn.disabled = false;
+  btn.textContent = failed ? 'Saved map (' + failed + ' tiles failed — try again on wifi)' : 'Map saved for offline ✓';
+  localStorage.setItem(STORE+'offlineAt', Date.now());
+  toast(failed ? 'Some tiles failed. Try again when the signal is better.' : 'Map saved. It will work without signal now.');
+}
+$('btnOffline').onclick = saveOffline;
+(function(){ const t = offlineTileList().length; $('offlineHint').textContent += ' About ' + t + ' tiles, roughly ' + Math.round(t*25/1024) + ' MB.'; const at = +localStorage.getItem(STORE+'offlineAt'); if (at) $('btnOffline').textContent = 'Map saved ' + new Date(at).toLocaleDateString() + ' — save again'; })();
+if ('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(() => {}); }
+
+// ---------- simulator (for testing at a desk: add ?sim to the URL) ----------
+if (state.sim){
+  $('sim').classList.add('show');
+  let playing = false, t = 0;
+  const upd = () => { const along = t/1000*TOTAL; const ll = pointAt(along); const jitter = 0.00004; handlePosition([ll[0] + (Math.random()-.5)*jitter, ll[1] + (Math.random()-.5)*jitter], 12, Date.now()); $('simInfo').textContent = fmtKm(along); };
+  $('simRange').oninput = (e) => { t = +e.target.value; upd(); };
+  $('simPlay').onclick = () => { playing = !playing; $('simPlay').textContent = playing ? '❚❚' : '▶'; };
+  setInterval(() => { if (playing){ t = Math.min(1000, t + 1); $('simRange').value = t; upd(); } }, 400);
+  window.SIM = {set:(v)=>{ t=v; $('simRange').value=v; upd(); }, setPos:(la,ln,acc)=>handlePosition([la,ln],acc||10,Date.now()), state, bufferInfo, passedIndex, nextIndex, checkIn, MS, TOTAL};
+}
+
+function tileInfo(){ $('tileInfo').textContent = 'Map tiles (' + layerNames[curLayer] + '): ' + tileStats.ok + ' loaded, ' + tileStats.err + ' failed' + (navigator.onLine ? '' : ' · offline'); }
+setInterval(tileInfo, 2000); tileInfo();
+if (staleCleared) toast('Cleared a start time from an earlier day', 5000);
+startGPS();
+render();
+setInterval(render, 15000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden){ render(); if (!state.sim && watchId === null) startGPS(); } });
+})();
+</script>
+</body>
+</html>

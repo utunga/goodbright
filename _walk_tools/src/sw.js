@@ -1,6 +1,6 @@
 /* Service worker: keeps the app and its map tiles available without signal. */
-const SHELL = 'shell-test_walk-v1';
-const TILES = 'tiles-test_walk-v1';
+const SHELL = 'shell-__SLUG__-v1';
+const TILES = 'tiles-__SLUG__-v1';
 const SHELL_FILES = ['./', 'index.html', 'data.js', 'print.html', 'overview.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-32.png'];
 const TILE_HOSTS = ['tiles-a.data-cdn.linz.govt.nz', 'tiles-b.data-cdn.linz.govt.nz', 'tiles-c.data-cdn.linz.govt.nz', 'tiles-d.data-cdn.linz.govt.nz', 'basemaps.linz.govt.nz', 'server.arcgisonline.com', 'tile.openstreetmap.org', 'tile.opentopomap.org', 'a.tile.opentopomap.org', 'b.tile.opentopomap.org', 'c.tile.opentopomap.org'];
 

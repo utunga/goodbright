@@ -1,8 +1,8 @@
 /* Service worker: keeps the app and its map tiles available without signal. */
 const SHELL = 'shell-freyja_walk-v1';
 const TILES = 'tiles-freyja_walk-v1';
-const SHELL_FILES = ['./', 'index.html', 'data.js', 'print.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-32.png'];
-const TILE_HOSTS = ['tiles-a.data-cdn.linz.govt.nz', 'tiles-b.data-cdn.linz.govt.nz', 'tiles-c.data-cdn.linz.govt.nz', 'tiles-d.data-cdn.linz.govt.nz', 'tile.openstreetmap.org', 'tile.opentopomap.org', 'a.tile.opentopomap.org', 'b.tile.opentopomap.org', 'c.tile.opentopomap.org'];
+const SHELL_FILES = ['./', 'index.html', 'data.js', 'print.html', 'overview.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-32.png'];
+const TILE_HOSTS = ['tiles-a.data-cdn.linz.govt.nz', 'tiles-b.data-cdn.linz.govt.nz', 'tiles-c.data-cdn.linz.govt.nz', 'tiles-d.data-cdn.linz.govt.nz', 'basemaps.linz.govt.nz', 'server.arcgisonline.com', 'tile.openstreetmap.org', 'tile.opentopomap.org', 'a.tile.opentopomap.org', 'b.tile.opentopomap.org', 'c.tile.opentopomap.org'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).catch(() => {}));

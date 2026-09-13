@@ -5,6 +5,7 @@ Two small web apps for goodbright.nz, one per walk. Each folder is self-containe
 
     goodbright.nz/freyja_walk/          the walk app (GPS, milestones, buffer, check-in)
     goodbright.nz/freyja_walk/print.html the printable A4 sheets
+    goodbright.nz/freyja_walk/overview.html the whole route on one page (PDF or PNG)
     goodbright.nz/test_walk/            same code, the short Roseneath loop
 
 `freyja_walk_v1/` and `test_walk_v1/` are the first cut, kept so the two can be
@@ -42,6 +43,7 @@ Export the map from My Maps again (⋮ → Export to KML/KMZ → entire map), dr
 over the .kml, adjust the .json, run `./build.sh`, copy `dist/<walk>/` over the
 folder here. `seam_report.txt` says where pieces were joined and by how much.
 
-Map tiles: LINZ Topo50 via the LINZ Data Service (key in the HTML, tile-only scope),
-with OpenStreetMap and OpenTopoMap as fallbacks. If Topo50 tiles fail to load the
+Map tiles: OpenStreetMap (default), LINZ Topo50 via the LINZ Data Service (key in the
+HTML, tile-only scope), LINZ aerial imagery via LINZ Basemaps with Esri World Imagery as
+its fallback, and OpenTopoMap. If Topo50 tiles fail to load the
 app switches itself to OpenStreetMap and says so.

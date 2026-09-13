@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Freyja's Walk — printable map sheets</title>
+<title>Freyja's Walk — whole route on one page</title>
 <style>
 /* required styles */
 
@@ -670,7 +670,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 </style>
 <style>
-:root{ --pw:281mm; --ph:194mm; --route:#e8590c; }
+:root{ --route:#e8590c; }
 *{box-sizing:border-box}
 body{margin:0;background:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#111}
 #bar{position:sticky;top:0;z-index:50;background:#1f2a37;color:#fff;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:14px}
@@ -679,67 +679,71 @@ body{margin:0;background:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,"S
 #bar button{background:#0b6bcb;color:#fff;font-weight:700}
 #bar button:disabled{background:#6b7280}
 #bar a{color:#fff}
-#pages{padding:14px}
-.page{width:var(--pw);height:var(--ph);background:#fff;margin:0 auto 14px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.35);page-break-after:always;break-after:page}
-.page:last-child{page-break-after:auto;break-after:auto}
-.head{height:10mm;display:flex;align-items:center;gap:6mm;padding:0 2mm;font-size:10pt;border-bottom:.3mm solid #111}
-.head b{font-size:12pt}
-.head .ms{flex:1;font-size:8pt;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.head .sheetno{font-weight:800;font-size:14pt}
-.map{width:var(--pw);height:calc(var(--ph) - 10mm);position:relative;background:#eef}
+#wrap{padding:14px;overflow:auto}
+#poster{background:#fff;margin:0 auto;position:relative;box-shadow:0 2px 12px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
+#head{display:flex;align-items:baseline;gap:5mm;padding:4mm 6mm 2mm;border-bottom:.4mm solid #111;flex:0 0 auto}
+#head h1{margin:0;font-size:9mm;line-height:1}
+#head .sub{font-size:4mm;color:#333}
+#head .right{margin-left:auto;font-size:3.6mm;color:#333;text-align:right}
+#body{display:flex;flex:1 1 auto;min-height:0}
+#map{flex:1 1 auto;min-width:0;background:#eef}
+#side{flex:0 0 auto;width:62mm;border-left:.3mm solid #111;padding:2.5mm 3mm;font-size:2.9mm;overflow:hidden}
+#side table{width:100%;border-collapse:collapse}
+#side td{padding:.7mm .8mm;border-bottom:.15mm solid #ddd;vertical-align:top;line-height:1.2}
+#side td.n{font-weight:800;color:var(--route);text-align:right;width:6mm}
+#side td.t{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+#side .sm{font-size:2.4mm;color:#666}
+#side .legend{margin-top:2mm;font-size:2.6mm;color:#333;line-height:1.5}
+.sw{display:inline-block;width:6mm;height:1mm;vertical-align:middle;margin-right:1mm}
+#poster.portrait #body{flex-direction:column}
+#poster.portrait #side{width:auto;border-left:0;border-top:.3mm solid #111;columns:2;column-gap:6mm;max-height:38%}
+#poster.nomap-side #side{display:none}
 .leaflet-container{font-family:inherit}
-.leaflet-control-attribution{font-size:7pt}
-.lbl{background:rgba(255,255,255,.95);border:.2mm solid #111;border-radius:1.2mm;padding:.4mm 1.2mm;font-size:8pt;font-weight:700;box-shadow:none;white-space:nowrap}
+.leaflet-control-attribution{font-size:2.4mm}
+.lbl{background:rgba(255,255,255,.95);border:.2mm solid #111;border-radius:1mm;padding:.3mm 1.1mm;font-size:2.8mm;font-weight:700;box-shadow:none;white-space:nowrap}
 .leaflet-tooltip.lbl::before{display:none}
 .lbl small{font-weight:600;color:#333}
-.msdot{width:6mm;height:6mm;border-radius:50%;background:#fff;border:.6mm solid var(--route);color:#111;font-weight:800;font-size:9pt;display:flex;align-items:center;justify-content:center}
+.msdot{width:5.2mm;height:5.2mm;border-radius:50%;background:#fff;border:.55mm solid var(--route);color:#111;font-weight:800;font-size:2.9mm;display:flex;align-items:center;justify-content:center}
 .msdot.finish{background:#111;color:#fff;border-color:#fff}
-.poi{width:5mm;height:5mm;border-radius:1mm;background:#fff;border:.4mm solid #0891b2;display:flex;align-items:center;justify-content:center}
-.poi svg{width:3.6mm;height:3.6mm}
-.lm{width:5.5mm;height:5.5mm;border-radius:1mm;background:#fff;border:.4mm solid #374151;display:flex;align-items:center;justify-content:center}
-.lm svg{width:4mm;height:4mm}
-.fold-note{position:absolute;z-index:700;font-size:8pt;font-weight:700;background:rgba(255,255,255,.9);padding:.5mm 1.5mm;border-radius:1mm;pointer-events:none}
-.north{position:absolute;right:4mm;top:4mm;z-index:700;width:10mm;text-align:center;font-size:8pt;font-weight:800;background:rgba(255,255,255,.85);border-radius:1mm;padding:1mm 0}
-.north svg{width:8mm;height:8mm;display:block;margin:0 auto}
-/* cover */
-.cover{padding:6mm 8mm;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:6mm;height:100%;min-height:0}
-.cover>div{min-height:0;overflow:hidden}
-.cover h1{margin:0 0 1mm;font-size:22pt}
-.cover .sub{color:#444;font-size:11pt;margin-bottom:4mm}
-.cover table{width:100%;border-collapse:collapse;font-size:8.5pt}
-.cover td,.cover th{padding:1mm 1.5mm;border-bottom:.2mm solid #ccc;text-align:left;vertical-align:top}
-.cover th{background:#f3f4f6;font-size:8pt}
-.cover td.n{font-weight:800;color:var(--route);text-align:right}
-.cover td.t{white-space:nowrap;font-variant-numeric:tabular-nums}
-.cover .sm{font-size:7.5pt;color:#555}
-.cover .ov{height:100%;display:flex;flex-direction:column}
-.cover .ov .map{flex:1;width:100%;height:auto;min-height:100mm;border:.3mm solid #111}
-.legend{font-size:8.5pt;margin-top:3mm;line-height:1.5}
-.legend span{display:inline-block;margin-right:4mm;white-space:nowrap}
-.sw{display:inline-block;width:8mm;height:1.2mm;vertical-align:middle;margin-right:1mm}
-.cellno{font-size:14pt;font-weight:800;color:#0b6bcb;background:rgba(255,255,255,.7);border-radius:1mm;padding:0 1.5mm}
+.poi{width:4.4mm;height:4.4mm;border-radius:.9mm;background:#fff;border:.35mm solid #0891b2;display:flex;align-items:center;justify-content:center}
+.poi svg{width:3.2mm;height:3.2mm}
+.lm{width:5mm;height:5mm;border-radius:.9mm;background:#fff;border:.35mm solid #374151;display:flex;align-items:center;justify-content:center}
+.lm svg{width:3.6mm;height:3.6mm}
+.north{position:absolute;right:4mm;top:4mm;z-index:700;width:9mm;text-align:center;font-size:2.8mm;font-weight:800;background:rgba(255,255,255,.85);border-radius:1mm;padding:.8mm 0}
+.north svg{width:7mm;height:7mm;display:block;margin:0 auto}
+#status{opacity:.9}
 @media print{
-  @page{ size:A4 landscape; margin:8mm; }
   body{background:#fff}
   #bar{display:none}
-  #pages{padding:0}
-  .page{margin:0;box-shadow:none;width:100%;height:100%}
+  #wrap{padding:0;overflow:visible}
+  #poster{margin:0;box-shadow:none}
   .leaflet-control-zoom{display:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
+<style id="pageStyle"></style>
 </head>
 <body>
 <div id="bar">
-  <b>Freyja's Walk — print sheets</b>
-  <label>Scale <select id="scale"><option value="auto" selected>auto</option><option value="10000">1:10,000</option><option value="15000">1:15,000</option><option value="20000">1:20,000</option><option value="25000">1:25,000</option><option value="30000">1:30,000</option><option value="40000">1:40,000</option></select></label>
-  <label>Map <select id="layer"><option value="osm" selected>Streets (OpenStreetMap)</option><option value="topo">LINZ Topo50</option><option value="sat">Satellite (LINZ aerial)</option><option value="satEsri">Satellite (Esri)</option><option value="otm">OpenTopoMap</option></select></label>
+  <b>Freyja's Walk — one page</b>
+  <label>Size <select id="size">
+    <option value="A4">A4</option><option value="A3" selected>A3</option><option value="A2">A2</option><option value="screen">1920 × 1080 screen</option>
+  </select></label>
+  <label>Orientation <select id="orient"><option value="landscape" selected>landscape</option><option value="portrait">portrait</option></select></label>
+  <label>Map <select id="layer">
+    <option value="osm" selected>Streets (OpenStreetMap)</option><option value="topo">LINZ Topo50</option><option value="sat">Satellite (LINZ aerial)</option><option value="satEsri">Satellite (Esri)</option><option value="otm">OpenTopoMap</option>
+  </select></label>
+  <label><input type="checkbox" id="showSide" checked> timetable</label>
+  <label><input type="checkbox" id="showLabels" checked> labels</label>
   <span id="status">…</span>
   <button id="print" disabled>Print / Save as PDF</button>
-  <a href="./">← back to the app</a> <a href="overview.html">one-page map</a>
-  <span style="font-size:12px;opacity:.8">A4 landscape · in the print dialog turn on “Background graphics” and set margins to Default.</span>
+  <button id="png" disabled>Save as PNG</button>
+  <a href="./">← app</a> <a href="print.html">sheets</a>
 </div>
-<div id="pages"></div>
+<div id="wrap"><div id="poster">
+  <div id="head"><h1>Freyja's Walk</h1><span class="sub" id="sub"></span><span class="right" id="facts"></span></div>
+  <div id="body"><div id="map"></div><div id="side"></div></div>
+</div></div>
 
 <script src="data.js"></script>
 <script>
@@ -757,19 +761,11 @@ const W = window.WALK;
 const LINZ_KEY = '1b095d00946a4967a289cff2eb6bfbd1';
 const R = 6371008.8;
 const $ = (id) => document.getElementById(id);
+const SIZES = {A4:[297,210], A3:[420,297], A2:[594,420], screen:[508,285.75]}; // mm (screen = 1920×1080 px at 96 dpi)
 
-// ---- paper geometry (mm)
-const PW = 281, PH = 194;          // printable page (A4 landscape minus 8 mm margins)
-const HEAD = 10;                   // header strip
-const OVERLAP = 6;                 // map printed beyond the fold line on every side
-const MAPW = PW, MAPH = PH - HEAD; // map area on the page
-const CELLW = MAPW - 2*OVERLAP, CELLH = MAPH - 2*OVERLAP;  // fold-to-fold cell
-
-// ---- local metric coordinates
 const lat0 = W.route.reduce((s,p)=>s+p[0],0)/W.route.length*Math.PI/180;
 const KX = R*Math.cos(lat0)*Math.PI/180, KY = R*Math.PI/180;
 const toXY = (ll) => [ll[1]*KX, ll[0]*KY];
-const toLL = (xy) => [xy[1]/KY, xy[0]/KX];
 const XY = W.route.map(toXY);
 const CUM = [0];
 for (let i=1;i<XY.length;i++) CUM.push(CUM[i-1] + Math.hypot(XY[i][0]-XY[i-1][0], XY[i][1]-XY[i-1][1]));
@@ -784,179 +780,179 @@ function pointAt(along){
 }
 const [nh, nm] = W.nominalStart.split(':').map(Number);
 function fmtOffset(min){ let t = nh*60+nm+min; let h = Math.floor(t/60)%24, m = t%60; const ap = h>=12?'pm':'am'; h=h%12||12; return h + ':' + String(m).padStart(2,'0') + ap; }
-function fmtKm(m){ return (m/1000).toFixed(1) + ' km'; }
 function fmtClock(hm){ const [h0, m] = hm.split(':').map(Number); let h = h0; const ap = h>=12?'pm':'am'; h=h%12||12; return h + ':' + String(m).padStart(2,'0') + ap; }
+const fmtKm = (m) => (m/1000).toFixed(1) + ' km';
+const FINAL = W.milestones[W.milestones.length-1];
 
-// ---- choose the grid: fewest cells, then keep milestones away from fold lines
-function planGrid(scale){
-  const cw = CELLW/1000*scale, ch = CELLH/1000*scale;  // cell size in ground metres
-  const xs = XY.map(p=>p[0]), ys = XY.map(p=>p[1]);
-  const minx = Math.min(...xs), miny = Math.min(...ys);
-  const samples = []; for (let a=0; a<=TOTAL; a+=20) samples.push(pointAt(a));
-  const extraPts = W.milestones.map(m=>toXY([m.lat,m.lng])).concat(W.landmarks.map(m=>toXY([m.lat,m.lng])), W.pois.map(m=>toXY([m.lat,m.lng])));
-  let best = null;
-  const N = 24;
-  for (let i=0;i<N;i++) for (let j=0;j<N;j++){
-    const ox = minx - cw + i*cw/N, oy = miny - ch + j*ch/N;
-    const cells = new Set();
-    for (const p of samples) cells.add(Math.floor((p[0]-ox)/cw) + ',' + Math.floor((p[1]-oy)/ch));
-    // a point within 2 mm of a fold line is unreadable: ask for it on both sheets — but prefer grids that avoid it
-    let edgePenalty = 0;
-    const margin = 3/1000*scale;
-    for (const p of extraPts){
-      const fx = ((p[0]-ox)%cw+cw)%cw, fy = ((p[1]-oy)%ch+ch)%ch;
-      if (fx < margin || fx > cw-margin || fy < margin || fy > ch-margin) edgePenalty++;
-    }
-    let marginSum = 0;
-    for (const p of samples){
-      const fx = ((p[0]-ox)%cw+cw)%cw, fy = ((p[1]-oy)%ch+ch)%ch;
-      marginSum += Math.min(fx, cw-fx, fy, ch-fy);
-    }
-    const score = cells.size*1e9 + edgePenalty*1e6 - marginSum/samples.length;
-    if (!best || score < best.score) best = {score, ox, oy, cells:[...cells]};
-  }
-  // order cells along the route
-  const first = {};
-  for (let a=0; a<=TOTAL; a+=20){ const p = pointAt(a); const k = Math.floor((p[0]-best.ox)/cw) + ',' + Math.floor((p[1]-best.oy)/ch); if (!(k in first)) first[k] = a; }
-  const cells = best.cells.map(k => { const [i,j] = k.split(',').map(Number); return {i, j, key:k, first:first[k] ?? 1e12}; }).sort((a,b)=>a.first-b.first);
-  cells.forEach((c, n) => { c.n = n+1; });
-  const byKey = {}; cells.forEach(c => byKey[c.key] = c);
-  for (const c of cells){
-    c.neigh = {N: byKey[c.i+','+(c.j+1)], S: byKey[c.i+','+(c.j-1)], E: byKey[(c.i+1)+','+c.j], W: byKey[(c.i-1)+','+c.j]};
-    const x0 = best.ox + c.i*cw, y0 = best.oy + c.j*ch;
-    c.cell = [[x0,y0],[x0+cw,y0+ch]];
-    const ov = OVERLAP/1000*scale;
-    c.page = [[x0-ov,y0-ov],[x0+cw+ov,y0+ch+ov]];
-    c.items = W.milestones.filter(m => { const p = toXY([m.lat,m.lng]); return p[0]>=c.page[0][0] && p[0]<=c.page[1][0] && p[1]>=c.page[0][1] && p[1]<=c.page[1][1]; });
-  }
-  return {cells, cw, ch, ox:best.ox, oy:best.oy};
-}
-
-// ---- layers
-function makeLayer(kind){
-  const retina = {tileSize:128, zoomOffset:1};
-  if (kind === 'topo') return L.tileLayer('https://tiles-{s}.data-cdn.linz.govt.nz/services;key=' + LINZ_KEY + '/tiles/v4/layer=50767/EPSG:3857/{z}/{x}/{y}.png', Object.assign({maxNativeZoom:15, maxZoom:18, subdomains:'abcd', attribution:'Topo50 © LINZ CC BY 4.0'}, retina));
-  if (kind === 'otm') return L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', Object.assign({maxNativeZoom:15, maxZoom:18, subdomains:'abc', attribution:'© OpenStreetMap, SRTM | © OpenTopoMap CC BY-SA'}, retina));
-  if (kind === 'sat') return L.tileLayer('https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp', Object.assign({maxNativeZoom:19, maxZoom:20, attribution:'Aerial © LINZ CC BY 4.0'}, retina));
-  if (kind === 'satEsri') return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', Object.assign({maxNativeZoom:18, maxZoom:20, attribution:'Imagery © Esri, Maxar, Earthstar Geographics'}, retina));
-  return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', Object.assign({maxNativeZoom:18, maxZoom:19, attribution:'© OpenStreetMap contributors'}, retina));
-}
 const SVG = {
   toilet: '<svg viewBox="0 0 24 24" fill="#0e7490"><circle cx="8" cy="4.5" r="2"/><path d="M6 8h4v6H9v7H7v-7H6z"/><circle cx="16.5" cy="4.5" r="2"/><path d="M14 8h5l1.5 7h-1.8l1 6h-4.4l1-6h-1.8z"/></svg>',
   view: '<svg viewBox="0 0 24 24" fill="#0e7490"><path d="M12 5C6.5 5 2.5 12 2.5 12s4 7 9.5 7 9.5-7 9.5-7-4-7-9.5-7zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z"/></svg>',
   school: '<svg viewBox="0 0 24 24" fill="#374151"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zm-7 9.6V17c0 1.7 3.1 3 7 3s7-1.3 7-3v-4.4l-7 3.8-7-3.8z"/></svg>',
   tent: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3 2 20h20L12 3zm0 5 5.5 9.5h-3L12 13l-2.5 4.5h-3L12 8z"/></svg>',
 };
-let pending = 0, layersMade = [];
-function trackLoading(layer){
-  layersMade.push(layer);
-  layer.on('loading', () => { pending++; updateStatus(); });
-  layer.on('load', () => { pending = Math.max(0, pending-1); updateStatus(); });
-}
-function updateStatus(){
-  $('status').textContent = pending ? 'loading map tiles… (' + pending + ' maps still loading)' : 'all tiles loaded — ready to print';
-  $('print').disabled = pending > 0;
-}
-function drawFeatures(map, opts){
-  L.polyline(W.route, {color:'#fff', weight:opts.big?8:6, opacity:.5}).addTo(map);
-  L.polyline(W.route, {color:'#e8590c', weight:opts.big?4:3, opacity:.75}).addTo(map);
-  for (const [i,j] of W.bridges) L.polyline([W.route[i], W.route[j]], {color:'#7c3aed', weight:opts.big?4:3, dashArray:'6 6'}).addTo(map);
-  for (const ex of W.extras) L.polyline(ex.coords, {color:'#4b5563', weight:3, dashArray:'4 8'}).addTo(map);
-  const dirs = {right:[1,0], left:[-1,0], top:[0,1], bottom:[0,-1]};
-  const offs = {right:[12,0], left:[-12,0], top:[0,-12], bottom:[0,12]};
-  W.milestones.forEach((m, i) => {
-    const mk = L.marker([m.lat, m.lng], {icon: L.divIcon({className:'', html:'<div class="msdot' + (m.finish?' finish':'') + '">' + (m.finish?SVG.tent:i) + '</div>', iconSize:[23,23], iconAnchor:[11,11]})}).addTo(map);
-    if (!opts.labels) return;
-    // put the label on the side furthest from the neighbouring milestones and the route line through this point
-    const here = toXY([m.lat, m.lng]);
-    const others = [];
-    for (const d of [-1, 1]){ const o = W.milestones[i+d]; if (o){ const p = toXY([o.lat,o.lng]); const v=[p[0]-here[0], p[1]-here[1]]; const L2=Math.hypot(v[0],v[1])||1; others.push([v[0]/L2, v[1]/L2]); } }
-    const a0 = pointAt(Math.max(0, m.along-80)), a1 = pointAt(Math.min(TOTAL, m.along+80));
-    for (const p of [a0, a1]){ const v=[p[0]-here[0], p[1]-here[1]]; const L2=Math.hypot(v[0],v[1])||1; if (L2>5) others.push([v[0]/L2, v[1]/L2]); }
-    let bestDir = 'right', bestScore = -1e9;
-    for (const [name, d] of Object.entries(dirs)){
-      let worst = 1e9; for (const o of others) worst = Math.min(worst, -(d[0]*o[0] + d[1]*o[1]));
-      const score = worst + (name === 'right' ? .01 : name === 'left' ? .005 : 0);
-      if (score > bestScore){ bestScore = score; bestDir = name; }
-    }
-    mk.bindTooltip('<b>' + i + '</b> ' + m.label + ' <small>' + fmtOffset(m.offset) + (m.break ? ' · ' + m.break + ' min' : '') + '</small>', {permanent:true, direction:bestDir, className:'lbl', offset:offs[bestDir]}).openTooltip();
-  });
-  for (const lm of W.landmarks){
-    const mk = L.marker([lm.lat, lm.lng], {icon: L.divIcon({className:'', html:'<div class="lm">' + (SVG[lm.kind]||'') + '</div>', iconSize:[21,21], iconAnchor:[10,10]})}).addTo(map);
-    if (opts.labels) mk.bindTooltip(lm.label, {permanent:true, direction:'bottom', className:'lbl', offset:[0,10]}).openTooltip();
-  }
-  for (const p of W.pois){
-    const mk = L.marker([p.lat, p.lng], {icon: L.divIcon({className:'', html:'<div class="poi">' + (SVG[p.kind]||'') + '</div>', iconSize:[19,19], iconAnchor:[9,9]})}).addTo(map);
-    if (opts.labels) mk.bindTooltip(p.label, {permanent:true, direction:'bottom', className:'lbl', offset:[0,9]}).openTooltip();
-  }
-}
-function fitExact(map, xyBounds){
-  // fit a metric box exactly into the container (fractional zoom)
-  const sw = toLL(xyBounds[0]), ne = toLL(xyBounds[1]);
-  map.fitBounds([sw, ne], {padding:[0,0], animate:false});
+const ATTR = {osm:'© OpenStreetMap contributors', topo:'Topo50 © LINZ CC BY 4.0', sat:'Aerial imagery © LINZ CC BY 4.0', satEsri:'Imagery © Esri, Maxar, Earthstar Geographics', otm:'© OpenStreetMap, SRTM | © OpenTopoMap CC BY-SA'};
+function makeLayer(kind){
+  const retina = {tileSize:128, zoomOffset:1, crossOrigin:'anonymous'};
+  if (kind === 'topo') return L.tileLayer('https://tiles-{s}.data-cdn.linz.govt.nz/services;key=' + LINZ_KEY + '/tiles/v4/layer=50767/EPSG:3857/{z}/{x}/{y}.png', Object.assign({maxNativeZoom:15, maxZoom:18, subdomains:'abcd', attribution:ATTR.topo}, retina));
+  if (kind === 'sat') return L.tileLayer('https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp', Object.assign({maxNativeZoom:19, maxZoom:20, attribution:ATTR.sat}, retina));
+  if (kind === 'satEsri') return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', Object.assign({maxNativeZoom:18, maxZoom:20, attribution:ATTR.satEsri}, retina));
+  if (kind === 'otm') return L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', Object.assign({maxNativeZoom:15, maxZoom:18, subdomains:'abc', attribution:ATTR.otm}, retina));
+  return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', Object.assign({maxNativeZoom:18, maxZoom:19, attribution:ATTR.osm}, retina));
 }
 
+// label side: away from neighbouring milestones and the line through the point
+const dirs = {right:[1,0], left:[-1,0], top:[0,1], bottom:[0,-1]};
+function labelDir(i){
+  const m = W.milestones[i], here = toXY([m.lat, m.lng]), others = [];
+  for (const d of [-1, 1]){ const o = W.milestones[i+d]; if (o){ const p = toXY([o.lat,o.lng]); const v=[p[0]-here[0], p[1]-here[1]]; const L2=Math.hypot(v[0],v[1])||1; others.push([v[0]/L2, v[1]/L2]); } }
+  for (const p of [pointAt(Math.max(0, m.along-80)), pointAt(Math.min(TOTAL, m.along+80))]){ const v=[p[0]-here[0], p[1]-here[1]]; const L2=Math.hypot(v[0],v[1])||1; if (L2>5) others.push([v[0]/L2, v[1]/L2]); }
+  let bestDir = 'right', bestScore = -1e9;
+  for (const [name, d] of Object.entries(dirs)){
+    let worst = 1e9; for (const o of others) worst = Math.min(worst, -(d[0]*o[0] + d[1]*o[1]));
+    const score = worst + (name === 'right' ? .01 : name === 'left' ? .005 : 0);
+    if (score > bestScore){ bestScore = score; bestDir = name; }
+  }
+  return bestDir;
+}
+const labelText = (i) => { const m = W.milestones[i]; return {n: String(i), name: m.label, time: fmtOffset(m.offset) + (m.break ? ' · ' + m.break + ' min' : '')}; };
+
+let map = null, tileLayer = null, pending = 0, loaded = false;
+function setStatus(){
+  $('status').textContent = loaded ? 'ready' : 'loading map tiles…';
+  $('print').disabled = !loaded; $('png').disabled = !loaded;
+}
 function build(){
-  let scale = +$('scale').value, kind = $('layer').value;
-  if (!scale){ // auto: 1:25,000 unless the whole route fits on one sheet, then the finest scale that still does
-    scale = 25000;
-    for (const s of [20000, 15000, 10000]){ if (planGrid(s).cells.length === 1) scale = s; else break; }
-    if (planGrid(25000).cells.length > 1) scale = 25000;
-  }
-  for (const l of layersMade) l.off();
-  layersMade = []; pending = 0;
-  $('pages').innerHTML = '';
-  const plan = planGrid(scale);
-  const cells = plan.cells;
-
-  // ---- cover page
-  const cover = document.createElement('div'); cover.className = 'page';
+  const size = $('size').value, orient = $('orient').value, kind = $('layer').value;
+  let [w, h] = SIZES[size]; if (orient === 'portrait') [w, h] = [h, w];
+  const poster = $('poster');
+  poster.style.width = w + 'mm'; poster.style.height = h + 'mm';
+  poster.className = (orient === 'portrait' ? 'portrait' : '') + ($('showSide').checked ? '' : ' nomap-side');
+  $('pageStyle').textContent = '@page{ size:' + (size === 'screen' ? '508mm 285.75mm' : size + ' ' + orient) + '; margin:0 }';
+  // header
+  $('sub').textContent = W.subtitle + ' · ' + fmtKm(TOTAL);
+  $('facts').innerHTML = 'Leave <b>' + fmtOffset(0) + '</b> · due at ' + FINAL.label + ' <b>' + fmtOffset(FINAL.offset) + '</b>' + (W.deadline ? ' · be there by <b>' + fmtClock(W.deadline) + '</b>' : ' · ' + W.bufferMin + ' min buffer') + '<br><span style="font-size:2.8mm">Map: ' + ATTR[kind] + '</span>';
+  // side table
   let rows = '';
   W.milestones.forEach((m, i) => {
-    const sheets = cells.filter(c => c.items.includes(m)).map(c => c.n).join(', ');
-    rows += '<tr><td class="n">' + (m.finish ? '⛺' : i) + '</td><td>' + m.label + (m.legNote ? '<div class="sm">leg: ' + m.legNote + '</div>' : '') + '</td><td class="t">' + fmtOffset(m.offset) + '</td><td>' + (m.break ? m.break + ' min' + (m.note ? '<div class="sm">' + m.note + '</div>' : '') : (m.note ? '<div class="sm">' + m.note + '</div>' : '')) + '</td><td class="t">' + fmtKm(m.along) + '</td><td class="t">' + sheets + '</td></tr>';
+    rows += '<tr><td class="n">' + (m.finish ? '⛺' : i) + '</td><td>' + m.label + (m.legNote ? '<div class="sm">' + m.legNote + '</div>' : '') + (m.break ? '<div class="sm">' + m.break + ' min' + (m.note ? ' — ' + m.note : '') + '</div>' : (m.note ? '<div class="sm">' + m.note + '</div>' : '')) + '</td><td class="t">' + fmtOffset(m.offset) + '<div class="sm">' + fmtKm(m.along) + '</div></td></tr>';
   });
-  cover.innerHTML = '<div class="cover"><div>' +
-    '<h1>' + W.title + '</h1><div class="sub">' + W.subtitle + ' · ' + fmtKm(TOTAL) + ' · leave ' + fmtOffset(0) + ', due ' + fmtOffset(W.milestones[W.milestones.length-1].offset) + ' (' + W.bufferMin + ' min buffer' + (W.deadline ? ' — be there by ' + fmtClock(W.deadline) : ' → ' + fmtOffset(W.milestones[W.milestones.length-1].offset + W.bufferMin)) + ')</div>' +
-    '<table><tr><th>#</th><th>Milestone</th><th>Arrive</th><th>Break</th><th>Walked</th><th>Sheet</th></tr>' + rows + '</table>' +
-    '<div class="legend"><span><i class="sw" style="background:#e8590c"></i>the route</span><span><i class="sw" style="background:#7c3aed;border-top:1px dashed #fff"></i>joined by hand</span><span><i class="sw" style="background:#4b5563"></i>optional: campsite to school</span><span><span class="poi" style="display:inline-flex;vertical-align:middle">' + (SVG.toilet) + '</span> toilets</span><span>Times are planned arrivals, before any break. Map: OpenStreetMap / LINZ Topo50. ' + cells.length + ' sheets at 1:' + scale.toLocaleString() + ', A4 landscape, north up. Fold on the dashed line; sheets then butt together.</span></div>' +
-    '</div><div class="ov"><div class="map" id="ovmap"></div></div></div>';
-  $('pages').appendChild(cover);
-  const ov = L.map('ovmap', {zoomControl:false, attributionControl:true, zoomSnap:0, zoomDelta:.25});
-  const ovl = makeLayer(kind); trackLoading(ovl); ovl.addTo(ov);
-  drawFeatures(ov, {labels:false, big:false});
-  for (const c of cells){
-    const sw = toLL(c.cell[0]), ne = toLL(c.cell[1]);
-    L.rectangle([sw, ne], {color:'#0b6bcb', weight:1.5, fillOpacity:.04}).addTo(ov);
-    L.marker([ (sw[0]+ne[0])/2, (sw[1]+ne[1])/2 ], {icon: L.divIcon({className:'', html:'<span class="cellno">' + c.n + '</span>', iconSize:[30,20], iconAnchor:[15,10]})}).addTo(ov);
+  $('side').innerHTML = '<table>' + rows + '</table><div class="legend"><i class="sw" style="background:#e8590c"></i>route &nbsp; <i class="sw" style="background:#7c3aed"></i>joined by hand &nbsp; <i class="sw" style="background:#4b5563"></i>optional' + (W.pois.length ? ' &nbsp; <span class="poi" style="display:inline-flex;vertical-align:middle">' + (SVG[W.pois[0].kind]||'') + '</span> ' + (W.pois[0].kind === 'toilet' ? 'toilets' : 'points of interest') : '') + '<br>Times are planned arrivals, before any break.</div>';
+  // map
+  if (map){ map.remove(); map = null; }
+  loaded = false; setStatus();
+  map = L.map('map', {zoomControl:false, attributionControl:true, zoomSnap:0, zoomDelta:.1, dragging:true, scrollWheelZoom:true});
+  tileLayer = makeLayer(kind).addTo(map);
+  tileLayer.on('loading', () => { loaded = false; setStatus(); });
+  tileLayer.on('load', () => { loaded = true; setStatus(); });
+  const b = L.latLngBounds(W.route);
+  map.fitBounds(b, {padding:[40, 40], animate:false});
+  L.polyline(W.route, {color:'#fff', weight:8, opacity:.6, interactive:false}).addTo(map);
+  L.polyline(W.route, {color:'#e8590c', weight:4, opacity:.85, interactive:false}).addTo(map);
+  for (const [i,j] of W.bridges) L.polyline([W.route[i], W.route[j]], {color:'#7c3aed', weight:4, dashArray:'6 6'}).addTo(map);
+  for (const ex of W.extras) L.polyline(ex.coords, {color:'#4b5563', weight:3, dashArray:'4 8'}).addTo(map);
+  const labels = $('showLabels').checked;
+  W.milestones.forEach((m, i) => {
+    const mk = L.marker([m.lat, m.lng], {icon: L.divIcon({className:'', html:'<div class="msdot' + (m.finish?' finish':'') + '">' + (m.finish?SVG.tent:i) + '</div>', iconSize:[20,20], iconAnchor:[10,10]})}).addTo(map);
+    if (labels){ const d = labelDir(i), t = labelText(i); mk.bindTooltip('<b>' + t.n + '</b> ' + t.name + ' <small>' + t.time + '</small>', {permanent:true, direction:d, className:'lbl', offset:{right:[11,0], left:[-11,0], top:[0,-11], bottom:[0,11]}[d]}).openTooltip(); }
+  });
+  for (const lm of W.landmarks){
+    const mk = L.marker([lm.lat, lm.lng], {icon: L.divIcon({className:'', html:'<div class="lm">' + (SVG[lm.kind]||'') + '</div>', iconSize:[19,19], iconAnchor:[9,9]})}).addTo(map);
+    if (labels) mk.bindTooltip(lm.label, {permanent:true, direction:'bottom', className:'lbl', offset:[0,9]}).openTooltip();
   }
-  ov.fitBounds(L.latLngBounds(cells.map(c => toLL(c.cell[0])).concat(cells.map(c => toLL(c.cell[1])))), {padding:[10,10], animate:false});
-
-  // ---- sheets
-  for (const c of cells){
-    const pg = document.createElement('div'); pg.className = 'page';
-    const items = c.items.map(m => (m.finish?'⛺':m.n) + ' ' + m.label + ' ' + fmtOffset(m.offset)).join(' · ');
-    const adj = ['N','E','S','W'].map(k => c.neigh[k] ? ({N:'↑',E:'→',S:'↓',W:'←'}[k]) + ' sheet ' + c.neigh[k].n : '').filter(Boolean).join('  ');
-    pg.innerHTML = '<div class="head"><span class="sheetno">Sheet ' + c.n + ' of ' + cells.length + '</span><b>' + W.title + '</b><span>1:' + scale.toLocaleString() + '</span><span>' + adj + '</span><span class="ms">' + items + '</span></div><div class="map" id="m' + c.n + '"></div>';
-    $('pages').appendChild(pg);
-    const map = L.map('m' + c.n, {zoomControl:false, attributionControl:true, zoomSnap:0, zoomDelta:.1, dragging:false, scrollWheelZoom:false, doubleClickZoom:false, touchZoom:false, boxZoom:false, keyboard:false});
-    const tl = makeLayer(kind); trackLoading(tl); tl.addTo(map);
-    fitExact(map, c.page);
-    drawFeatures(map, {labels:true, big:true});
-    // fold lines
-    L.rectangle([toLL(c.cell[0]), toLL(c.cell[1])], {color:'#111', weight:1, dashArray:'6 4', fill:false, interactive:false}).addTo(map);
-    L.control.scale({metric:true, imperial:false, position:'bottomleft', maxWidth:150}).addTo(map);
-    const el = $('m' + c.n);
-    const notes = [['N','top:8mm;left:50%;transform:translateX(-50%)'],['S','bottom:8mm;left:50%;transform:translateX(-50%)'],['E','right:8mm;top:50%;transform:translateY(-50%)'],['W','left:8mm;top:50%;transform:translateY(-50%)']];
-    for (const [k, css] of notes){
-      if (c.neigh[k]){ const d = document.createElement('div'); d.className = 'fold-note'; d.style.cssText = css; d.textContent = 'sheet ' + c.neigh[k].n + ' →'.replace('→', {N:'↑',S:'↓',E:'→',W:'←'}[k]); el.appendChild(d); }
-    }
-    const n = document.createElement('div'); n.className = 'north'; n.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2 6 20l6-4 6 4z" fill="#111"/></svg>N'; el.appendChild(n);
+  for (const p of W.pois){
+    const mk = L.marker([p.lat, p.lng], {icon: L.divIcon({className:'', html:'<div class="poi">' + (SVG[p.kind]||'') + '</div>', iconSize:[17,17], iconAnchor:[8,8]})}).addTo(map);
+    if (labels) mk.bindTooltip(p.label, {permanent:true, direction:'bottom', className:'lbl', offset:[0,8]}).openTooltip();
   }
-  updateStatus();
+  L.control.scale({metric:true, imperial:false, position:'bottomleft', maxWidth:200}).addTo(map);
+  const n = document.createElement('div'); n.className = 'north'; n.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2 6 20l6-4 6 4z" fill="#111"/></svg>N'; $('map').appendChild(n);
 }
-$('scale').onchange = build; $('layer').onchange = build;
+
+// ---- PNG export: redraw the tiles, route, markers and labels on a canvas at 2× ----
+function px(mm){ return mm * 96 / 25.4; }
+async function savePng(){
+  const poster = $('poster'), mapEl = $('map');
+  const prect = poster.getBoundingClientRect(), mrect = mapEl.getBoundingClientRect();
+  const S = 2;
+  const cv = document.createElement('canvas'); cv.width = Math.round(prect.width*S); cv.height = Math.round(prect.height*S);
+  const ctx = cv.getContext('2d'); ctx.scale(S, S);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, prect.width, prect.height);
+  const ox = mrect.left - prect.left, oy = mrect.top - prect.top;
+  // tiles
+  ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, mrect.width, mrect.height); ctx.clip();
+  ctx.fillStyle = '#eef'; ctx.fillRect(ox, oy, mrect.width, mrect.height);
+  let tainted = false;
+  for (const img of mapEl.querySelectorAll('img.leaflet-tile-loaded')){
+    const r = img.getBoundingClientRect();
+    try { ctx.drawImage(img, r.left - prect.left, r.top - prect.top, r.width, r.height); } catch(e){ tainted = true; }
+  }
+  const P = (ll) => { const p = map.latLngToContainerPoint(ll); return [ox + p.x, oy + p.y]; };
+  const line = (pts, style) => { ctx.beginPath(); pts.forEach((ll, k) => { const [x,y] = P(ll); k ? ctx.lineTo(x,y) : ctx.moveTo(x,y); }); Object.assign(ctx, style); ctx.setLineDash(style.dash || []); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke(); ctx.setLineDash([]); };
+  line(W.route, {strokeStyle:'rgba(255,255,255,.6)', lineWidth:8});
+  line(W.route, {strokeStyle:'rgba(232,89,12,.9)', lineWidth:4});
+  for (const [i,j] of W.bridges) line([W.route[i], W.route[j]], {strokeStyle:'#7c3aed', lineWidth:4, dash:[6,6]});
+  for (const ex of W.extras) line(ex.coords, {strokeStyle:'#4b5563', lineWidth:3, dash:[4,8]});
+  const fontPx = px(2.8);
+  const box = (x, y, text, sub) => {
+    ctx.font = '700 ' + fontPx + 'px -apple-system, Helvetica, Arial, sans-serif';
+    const w1 = ctx.measureText(text).width; ctx.font = '600 ' + fontPx*0.9 + 'px -apple-system, Helvetica, Arial, sans-serif'; const w2 = ctx.measureText(sub).width;
+    const w = w1 + w2 + px(4), h = fontPx*1.5;
+    ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.strokeStyle = '#111'; ctx.lineWidth = .8;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y - h/2, w, h, 3) : ctx.rect(x, y - h/2, w, h); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.font = '700 ' + fontPx + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.textBaseline = 'middle'; ctx.fillText(text, x + px(1.2), y);
+    ctx.fillStyle = '#333'; ctx.font = '600 ' + fontPx*0.9 + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText(sub, x + px(1.2) + w1 + px(1.2), y);
+    return [w, h];
+  };
+  const labels = $('showLabels').checked;
+  for (const p of W.pois){ const [x,y] = P([p.lat,p.lng]); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.5; ctx.fillRect(x-8, y-8, 16, 16); ctx.strokeRect(x-8, y-8, 16, 16); ctx.fillStyle = '#0e7490'; ctx.font = '700 9px Helvetica, Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(p.kind === 'toilet' ? 'WC' : '◉', x, y); ctx.textAlign = 'left'; }
+  for (const lm of W.landmarks){ const [x,y] = P([lm.lat,lm.lng]); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#374151'; ctx.lineWidth = 1.5; ctx.fillRect(x-9, y-9, 18, 18); ctx.strokeRect(x-9, y-9, 18, 18); ctx.fillStyle = '#374151'; ctx.font = '700 11px Helvetica, Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('S', x, y); ctx.textAlign = 'left'; if (labels){ ctx.font = '700 ' + fontPx*0.9 + 'px Helvetica, Arial'; const w = ctx.measureText(lm.label).width + px(2.4); ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fillRect(x - w/2, y + 11, w, fontPx*1.3); ctx.strokeRect(x - w/2, y + 11, w, fontPx*1.3); ctx.fillStyle = '#111'; ctx.textBaseline = 'top'; ctx.fillText(lm.label, x - w/2 + px(1.2), y + 12); } }
+  W.milestones.forEach((m, i) => {
+    const [x,y] = P([m.lat,m.lng]); const r = px(2.6);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fillStyle = m.finish ? '#111' : '#fff'; ctx.fill(); ctx.lineWidth = px(.55); ctx.strokeStyle = m.finish ? '#fff' : '#e8590c'; ctx.stroke();
+    ctx.fillStyle = m.finish ? '#fff' : '#111'; ctx.font = '800 ' + px(2.9) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(m.finish ? '⛺' : String(i), x, y + 0.5); ctx.textAlign = 'left';
+    if (!labels) return;
+    const d = labelDir(i), t = labelText(i), text = t.n + ' ' + t.name, sub = t.time;
+    ctx.font = '700 ' + fontPx + 'px -apple-system, Helvetica, Arial, sans-serif'; const w1 = ctx.measureText(text).width; ctx.font = '600 ' + fontPx*0.9 + 'px -apple-system, Helvetica, Arial, sans-serif'; const w = w1 + ctx.measureText(sub).width + px(4), h = fontPx*1.5;
+    const gap = r + 3;
+    let lx = x + gap, ly = y;
+    if (d === 'left') lx = x - gap - w; else if (d === 'top'){ lx = x - w/2; ly = y - gap - h/2; } else if (d === 'bottom'){ lx = x - w/2; ly = y + gap + h/2; }
+    box(lx, ly, text, sub);
+  });
+  ctx.restore();
+  // header + side, as text
+  ctx.fillStyle = '#111'; ctx.textBaseline = 'alphabetic';
+  ctx.font = '800 ' + px(9) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText(W.title, px(6), px(11));
+  ctx.font = '400 ' + px(4) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillStyle = '#333'; ctx.fillText(W.subtitle + ' · ' + fmtKm(TOTAL), px(6) + ctx.measureText(W.title).width * 2.3 + px(5), px(11));
+  const facts = 'Leave ' + fmtOffset(0) + ' · due at ' + FINAL.label + ' ' + fmtOffset(FINAL.offset) + (W.deadline ? ' · be there by ' + fmtClock(W.deadline) : ' · ' + W.bufferMin + ' min buffer');
+  ctx.font = '600 ' + px(3.6) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.textAlign = 'right'; ctx.fillText(facts, prect.width - px(6), px(8.5));
+  ctx.font = '400 ' + px(2.8) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText('Map: ' + ATTR[$('layer').value], prect.width - px(6), px(12.5)); ctx.textAlign = 'left';
+  ctx.fillStyle = '#111'; ctx.fillRect(0, oy - 1, prect.width, 1.2);
+  if ($('showSide').checked){
+    const side = $('side'), srect = side.getBoundingClientRect();
+    const sx = srect.left - prect.left, sy = srect.top - prect.top;
+    if (!poster.classList.contains('portrait')) ctx.fillRect(sx, sy, 1, srect.height);
+    let y = sy + px(5), rowH = px(5.6), col = 0;
+    const colW = poster.classList.contains('portrait') ? srect.width / 2 : srect.width;
+    const nRows = W.milestones.length, perCol = poster.classList.contains('portrait') ? Math.ceil(nRows/2) : nRows;
+    W.milestones.forEach((m, i) => {
+      if (i === perCol && poster.classList.contains('portrait')){ col = 1; y = sy + px(5); }
+      const x0 = sx + px(3) + col*colW;
+      ctx.fillStyle = '#e8590c'; ctx.font = '800 ' + px(2.9) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.textAlign = 'right'; ctx.fillText(m.finish ? '⛺' : String(i), x0 + px(6), y); ctx.textAlign = 'left';
+      ctx.fillStyle = '#111'; ctx.font = '400 ' + px(2.9) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText(m.label, x0 + px(8), y);
+      ctx.textAlign = 'right'; ctx.fillText(fmtOffset(m.offset), x0 + colW - px(4), y); ctx.textAlign = 'left';
+      const sub = [m.legNote, m.break ? m.break + ' min' + (m.note ? ' — ' + m.note : '') : m.note].filter(Boolean).join(' · ');
+      if (sub){ ctx.fillStyle = '#666'; ctx.font = '400 ' + px(2.3) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText(sub.slice(0, 60), x0 + px(8), y + px(2.8)); }
+      y += rowH;
+    });
+  }
+  if (tainted){ alert('The map tiles could not be copied into the image (the tile server blocks it). Use Print / Save as PDF instead.'); return; }
+  cv.toBlob((blob) => {
+    if (!blob){ alert('Could not make the image. Use Print / Save as PDF instead.'); return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = W.slug + '_map.png'; document.body.appendChild(a); a.click(); a.remove();
+  }, 'image/png');
+}
+['size','orient','layer','showSide','showLabels'].forEach(id => $(id).onchange = build);
 $('print').onclick = () => window.print();
+$('png').onclick = () => savePng().catch(e => alert('Could not make the image: ' + e.message + '. Use Print / Save as PDF instead.'));
 build();
 })();
 </script>
