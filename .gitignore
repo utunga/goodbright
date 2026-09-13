@@ -6,3 +6,7 @@ node_modules
 .bundle/config
 bin/*
 Claude outputs
+.vscode
+freyja_walk_v1
+receipts
+test_walk_v1

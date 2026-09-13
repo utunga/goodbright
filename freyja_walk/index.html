@@ -1210,8 +1210,12 @@ function render(){
   // buttons
   const b = $('btns');
   if (!state.startAt){
-    b.innerHTML = '<button class="big start" id="btnStart">Start the walk</button><button class="big ghost" id="btnList">List</button>';
-    $('btnStart').onclick = () => { state.startAt = Date.now(); state.checked = (state.pos && hav(state.pos, [MS[0].lat, MS[0].lng]) < 60) ? [0] : []; state.announced = []; save(); toast('Started ' + fmt(new Date()) + '. Go well!'); refreshTooltips(); render(); };
+    b.innerHTML = '<button class="big start" id="btnStart">Start the walk</button><button class="big wa" id="btnCheckin">Check in</button><button class="big ghost" id="btnList">List</button>';
+    $('btnStart').onclick = () => {
+      if (!confirm('Start the walk now (' + fmt(new Date()) + ')? Every planned time shifts to this start. You can undo it in the menu.')) return;
+      state.startAt = Date.now(); state.checked = (state.pos && hav(state.pos, [MS[0].lat, MS[0].lng]) < 60) ? [0] : []; state.announced = []; save(); toast('Started ' + fmt(new Date()) + '. Go well!'); refreshTooltips(); render();
+    };
+    $('btnCheckin').onclick = checkIn;
   } else {
     b.innerHTML = '<button class="big wa" id="btnCheckin">Check in</button><button class="big ghost" id="btnList">Milestones</button>';
     $('btnCheckin').onclick = checkIn;
@@ -1243,7 +1247,7 @@ function showMilestone(i){
 
 // ---------- check-in ----------
 function checkIn(){
-  const parts = [W.title + ' check-in ' + fmt(new Date()) + '.'];
+  const parts = [W.title + ' check-in ' + fmt(new Date()) + (state.startAt ? '.' : ' (not started yet).')];
   const nearI = nearIndex();
   if (nearI !== null){
     // a check-in within 60 m of a milestone is what ticks it
