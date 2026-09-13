@@ -8,10 +8,10 @@ start: 'Directions from Home to Top of Winchester St' (as drawn), 20 m from 'Hom
 order: 'Directions from Home to Top of Winchester St' -> 'to nicholson road connect' -> 'Directions from Nicholson Road Connect to Horokiwi Viewpoint' -> 'walking track to belmont trig' -> 'Belmont trig to belmont trig carpark' -> 'Directions from belmont trig track carpark to 278 Normandale Rd (the farm)'
 seam -> 'to nicholson road connect': gap 4 m (bridged with a straight line)
 seam -> 'Directions from Nicholson Road Connect to Horokiwi Viewpoint': gap 16 m (bridged with a straight line)
-seam -> 'walking track to belmont trig': gap 11 m (bridged with a straight line); kept the 188 m spur to 'Horokiwi viewpoint' and retraced it back along the same line
+seam -> 'walking track to belmont trig': gap 11 m (bridged with a straight line); trimmed 188 m off the end of the previous piece
 seam -> 'Belmont trig to belmont trig carpark': gap 5 m (bridged with a straight line); kept the 249 m spur to 'Belmont Trig' and retraced it back along the same line
 seam -> 'Directions from belmont trig track carpark to 278 Normandale Rd (the farm)': gap 28 m (bridged with a straight line)
-joined route: 1840 vertices, 30.52 km
+joined route: 1788 vertices, 30.15 km
 milestone  0 'Home': 20 m from route, 0.00 km along, +0 min
 milestone  1 'Te Waka Pou': 4 m from route, 2.84 km along, +32 min
 milestone  2 'Gandhi statue (railway station)': 17 m from route, 4.78 km along, +59 min
@@ -22,13 +22,13 @@ milestone  6 'Start of Burma Road': 1 m from route, 10.35 km along, +195 min
 milestone  7 'Helston Road bridge': 8 m from route, 13.37 km along, +256 min
 milestone  8 'Top of Cedarwood St': 0 m from route, 16.62 km along, +313 min
 milestone  9 '279 Horokiwi Rd': 1 m from route, 17.85 km along, +333 min
-milestone 10 'Horokiwi viewpoint': 3 m from route, 21.62 km along, +401 min
-milestone 11 'Bridge across the stream': 7 m from route, 22.94 km along, +441 min
-milestone 12 'Belmont Trig': 7 m from route, 24.57 km along, +496 min
-milestone 13 'Belmont trig track carpark': 0 m from route, 27.30 km along, +571 min
-milestone 14 '4 Cottle Park Drive': 3 m from route, 29.07 km along, +601 min
-milestone 15 '278 Normandale Rd (the farm)': 1 m from route, 30.52 km along, +628 min
-milestone 16 'Campsite': 175 m from route, 30.52 km along, +643 min <-- more than 60 m off the line
+milestone 10 'Horokiwi viewpoint': 6 m from route, 21.44 km along, +401 min
+milestone 11 'Bridge across the stream': 7 m from route, 22.57 km along, +441 min
+milestone 12 'Belmont Trig': 7 m from route, 24.20 km along, +496 min
+milestone 13 'Belmont trig track carpark': 0 m from route, 26.93 km along, +571 min
+milestone 14 '4 Cottle Park Drive': 3 m from route, 28.69 km along, +601 min
+milestone 15 '278 Normandale Rd (the farm)': 1 m from route, 30.15 km along, +628 min
+milestone 16 'Campsite': 175 m from route, 30.15 km along, +643 min <-- more than 60 m off the line
 extended route 175 m to the finish with a straight line
 leg  1 'Home' -> 'Te Waka Pou': 2.84 km in 32 min = 5.3 km/h
 leg  2 'Te Waka Pou' -> 'Gandhi statue (railway station)': 1.94 km in 27 min = 4.3 km/h
@@ -39,8 +39,8 @@ leg  6 'Nicholson Road connect' -> 'Start of Burma Road': 1.70 km in 26 min = 3.
 leg  7 'Start of Burma Road' -> 'Helston Road bridge': 3.02 km in 61 min = 3.0 km/h
 leg  8 'Helston Road bridge' -> 'Top of Cedarwood St': 3.25 km in 57 min = 3.4 km/h
 leg  9 'Top of Cedarwood St' -> '279 Horokiwi Rd': 1.23 km in 20 min = 3.7 km/h
-leg 10 '279 Horokiwi Rd' -> 'Horokiwi viewpoint': 3.77 km in 53 min = 4.3 km/h
-leg 11 'Horokiwi viewpoint' -> 'Bridge across the stream': 1.32 km in 30 min = 2.6 km/h
+leg 10 '279 Horokiwi Rd' -> 'Horokiwi viewpoint': 3.59 km in 53 min = 4.1 km/h
+leg 11 'Horokiwi viewpoint' -> 'Bridge across the stream': 1.13 km in 30 min = 2.3 km/h
 leg 12 'Bridge across the stream' -> 'Belmont Trig': 1.63 km in 45 min = 2.2 km/h
 leg 13 'Belmont Trig' -> 'Belmont trig track carpark': 2.73 km in 45 min = 3.6 km/h
 leg 14 'Belmont trig track carpark' -> '4 Cottle Park Drive': 1.76 km in 30 min = 3.5 km/h

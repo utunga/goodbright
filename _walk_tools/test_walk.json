@@ -1,0 +1,54 @@
+{
+  "slug": "test_walk",
+  "title": "Test Walk",
+  "subtitle": "Roseneath loop — timing and GPS test",
+  "nominal_start": "10:00",
+  "buffer_min": 20,
+  "deadline_label": "home, 20 min after the plan",
+  "kml": "test_walk.kml",
+  "milestone_folder": "Untitled layer",
+  "exclude_lines": [],
+  "milestones": [
+    {
+      "kml": "home",
+      "label": "Home",
+      "offset": 0,
+      "note": "Start here."
+    },
+    {
+      "kml": "the crescent",
+      "label": "The Crescent",
+      "offset": 20,
+      "break": 20,
+      "note": "sit down, have a snack"
+    },
+    {
+      "label": "Grass Street",
+      "coords": [
+        174.7972759,
+        -41.2910323
+      ],
+      "offset": 60
+    },
+    {
+      "kml": "the point",
+      "label": "The Point",
+      "offset": 75
+    },
+    {
+      "label": "Home again",
+      "coords": [
+        174.8018634,
+        -41.2926744
+      ],
+      "offset": 90,
+      "finish": true,
+      "note": "Back where you started."
+    }
+  ],
+  "landmarks": [],
+  "extra_lines": [],
+  "poi_folders": {
+    "points of interest": "view"
+  }
+}

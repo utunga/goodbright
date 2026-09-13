@@ -1,0 +1,150 @@
+{
+  "slug": "freyja_walk",
+  "title": "Freyja's Walk",
+  "subtitle": "Roseneath to Belmont, on foot",
+  "nominal_start": "06:15",
+  "buffer_min": 60,
+  "deadline_label": "6pm at the campsite",
+  "kml": "freyja_walk.kml",
+  "milestone_folder": "Untitled layer",
+  "exclude_lines": [
+    "campsite to school"
+  ],
+  "milestones": [
+    {
+      "kml": "Home",
+      "label": "Home",
+      "offset": 0,
+      "note": "108 Maida Vale Rd. Leave 6:15."
+    },
+    {
+      "kml": "Pou",
+      "label": "Te Waka Pou",
+      "offset": 32,
+      "note": "first breakfast?"
+    },
+    {
+      "kml": "Mahatma Gandhi Statue",
+      "label": "Gandhi statue (railway station)",
+      "offset": 59,
+      "break": 15,
+      "note": "first breakfast?"
+    },
+    {
+      "kml": "1 Kaiwharawhara Rd",
+      "label": "1 Kaiwharawhara Rd",
+      "offset": 112
+    },
+    {
+      "kml": "Top of Winchester St",
+      "label": "Top of Winchester St",
+      "offset": 124
+    },
+    {
+      "kml": "Nicholson Road Connect",
+      "label": "Nicholson Road connect",
+      "offset": 154,
+      "break": 15,
+      "note": "second breakfast",
+      "leg_note": "bridle track"
+    },
+    {
+      "kml": "Start of Burma Road",
+      "label": "Start of Burma Road",
+      "offset": 195
+    },
+    {
+      "kml": "Helston Road Bridge",
+      "label": "Helston Road bridge",
+      "offset": 256
+    },
+    {
+      "kml": "Top of Cedarwood street",
+      "label": "Top of Cedarwood St",
+      "offset": 313
+    },
+    {
+      "kml": "279 Horokiwi Rd",
+      "label": "279 Horokiwi Rd",
+      "offset": 333,
+      "break": 15,
+      "note": "elevenses",
+      "leg_note": "scary no access bit"
+    },
+    {
+      "label": "Horokiwi viewpoint",
+      "offset": 401,
+      "break": 10,
+      "note": "before plunging down hill — the off-road track starts here",
+      "leg_note": "not good in the dark",
+      "coords": [
+        174.8571324,
+        -41.1873794
+      ]
+    },
+    {
+      "kml": "\"bridge\" across stream",
+      "label": "Bridge across the stream",
+      "offset": 441,
+      "break": 10,
+      "note": "boosted before climb",
+      "leg_note": "through the bush"
+    },
+    {
+      "kml": "Belmont Trig",
+      "label": "Belmont Trig",
+      "offset": 496,
+      "break": 30,
+      "note": "lunch",
+      "leg_note": "bush bashing"
+    },
+    {
+      "kml": "belmont trig track carpark",
+      "label": "Belmont trig track carpark",
+      "offset": 571,
+      "leg_note": "still in the bush"
+    },
+    {
+      "kml": "4 cottle park drive",
+      "label": "4 Cottle Park Drive",
+      "offset": 601,
+      "note": "turn left",
+      "leg_note": "scary narrow street — needs to not be dark"
+    },
+    {
+      "kml": "278 Normandale Rd (the farm)",
+      "label": "278 Normandale Rd (the farm)",
+      "offset": 628,
+      "leg_note": "entrance to farm"
+    },
+    {
+      "label": "Campsite",
+      "coords": [
+        174.9036948,
+        -41.1926046
+      ],
+      "offset": 643,
+      "note": "Camp here. School is just below.",
+      "leg_note": "walk down from farm to school",
+      "finish": true
+    }
+  ],
+  "landmarks": [
+    {
+      "kml": "Raphael House",
+      "label": "Raphael House (school)",
+      "kind": "school"
+    }
+  ],
+  "extra_lines": [
+    {
+      "kml": "campsite to school",
+      "label": "Campsite to school",
+      "style": "dashed"
+    }
+  ],
+  "poi_folders": {
+    "public toilets": "toilet"
+  },
+  "deadline": "18:00"
+}
