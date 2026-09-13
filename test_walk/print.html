@@ -956,7 +956,34 @@ function build(){
   updateStatus();
 }
 $('scale').onchange = build; $('layer').onchange = build;
-$('print').onclick = () => window.print();
+
+// ---- printing: Chrome drops Leaflet's transformed tile layers from the print output, so just before
+// printing every map's loaded tiles are copied onto a plain canvas that sits under the route and labels.
+function snapshotTiles(mapEl){
+  if (mapEl.querySelector('canvas.print-snapshot')) return;
+  const mrect = mapEl.getBoundingClientRect(); if (!mrect.width) return;
+  const S = 2;
+  const cv = document.createElement('canvas'); cv.width = Math.round(mrect.width*S); cv.height = Math.round(mrect.height*S);
+  cv.className = 'print-snapshot';
+  cv.style.cssText = 'position:absolute;left:0;top:0;width:' + mrect.width + 'px;height:' + mrect.height + 'px;z-index:150;pointer-events:none';
+  const ctx = cv.getContext('2d'); ctx.scale(S, S);
+  ctx.fillStyle = '#eef'; ctx.fillRect(0, 0, mrect.width, mrect.height);
+  for (const img of mapEl.querySelectorAll('img.leaflet-tile-loaded')){
+    const r = img.getBoundingClientRect();
+    try { ctx.drawImage(img, r.left - mrect.left, r.top - mrect.top, r.width, r.height); } catch(e){}
+  }
+  mapEl.appendChild(cv);
+  const pane = mapEl.querySelector('.leaflet-tile-pane'); if (pane) pane.style.visibility = 'hidden';
+}
+function restoreTiles(mapEl){
+  mapEl.querySelectorAll('canvas.print-snapshot').forEach(c => c.remove());
+  const pane = mapEl.querySelector('.leaflet-tile-pane'); if (pane) pane.style.visibility = '';
+}
+const allMaps = () => document.querySelectorAll('.leaflet-container');
+window.addEventListener('beforeprint', () => allMaps().forEach(snapshotTiles));
+window.addEventListener('afterprint', () => allMaps().forEach(restoreTiles));
+function printNow(){ allMaps().forEach(snapshotTiles); setTimeout(() => { window.print(); setTimeout(() => allMaps().forEach(restoreTiles), 1500); }, 50); }
+$('print').onclick = printNow;
 build();
 })();
 </script>
