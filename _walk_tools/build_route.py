@@ -246,6 +246,7 @@ def main(cfg_path, out_dir):
             'n': k, 'label': m['label'], 'lat': round(m['lonlat'][1], 6), 'lng': round(m['lonlat'][0], 6),
             'along': round(along), 'offset': m['offset'], 'break': m.get('break', 0),
             'note': m.get('note', ''), 'legNote': m.get('leg_note', ''), 'finish': bool(m.get('finish')),
+            'checkin': m.get('checkin', ''), 'checkinNote': m.get('checkin_note', ''),   # 'send' = WhatsApp check-in required here, 'test' = practice send, 'call' = phone Dad
             'offLine': round(d),
         })
     # ---- the last milestone: if the route continues past it, cut the route there (finish means finish)

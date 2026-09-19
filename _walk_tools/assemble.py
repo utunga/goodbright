@@ -32,6 +32,7 @@ def main(cfg_path, out_dir, linz_key):
         s = open(os.path.join(SRC, name)).read()
         s = s.replace('/*__LEAFLET_CSS__*/', leaflet_css).replace('/*__LEAFLET_JS__*/', leaflet_js)
         s = s.replace('__TITLE__', cfg['title']).replace('__SHORT_TITLE__', short).replace('__LINZ_KEY__', linz_key)
+        s = s.replace('__HAS_DIRECTIONS__', 'true' if os.path.exists(os.path.join(ROOT, 'osm_runs_' + cfg['slug'] + '.txt')) else 'false')
         open(os.path.join(out_dir, name), 'w').write(s)
     open(os.path.join(out_dir, 'sw.js'), 'w').write(open(os.path.join(SRC, 'sw.js')).read().replace('__SLUG__', cfg['slug']))
     manifest = {

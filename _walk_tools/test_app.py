@@ -5,7 +5,7 @@ os.environ['PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS'] = '1'
 from PIL import Image, ImageDraw
 from playwright.async_api import async_playwright
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, 'dist')
 OUT = os.path.join(ROOT, 'test_out')
 os.makedirs(OUT, exist_ok=True)
@@ -49,6 +49,7 @@ async def main():
             page = await ctx.new_page()
             page.on('console', lambda m: errors.append(('console', m.type, m.text)) if m.type in ('error', 'warning') else None)
             page.on('pageerror', lambda e: errors.append(('pageerror', str(e))))
+            page.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
 
             # ---------- test walk with the simulator ----------
             await page.goto(f'http://127.0.0.1:{PORT}/test_walk/?sim', wait_until='networkidle')
@@ -60,7 +61,7 @@ async def main():
             # walk along: at 0.35 of the route (past the crescent) -> expect milestone 1 reached
             await page.evaluate('SIM.set(350)')
             await page.wait_for_timeout(500)
-            info = await page.evaluate('({checked: SIM.state.checked, passed: SIM.passedIndex(), along: SIM.state.along, buf: SIM.bufferInfo(), next: document.getElementById("nextName").textContent, meta: document.getElementById("nextMeta").textContent, buffer: document.getElementById("buffer").textContent})')
+            info = await page.evaluate('({checked: SIM.state.checked, lastTick: SIM.lastTick(), along: SIM.state.along, buf: SIM.bufferInfo(), next: document.getElementById("nextName").textContent, meta: document.getElementById("nextMeta").textContent, buffer: document.getElementById("buffer").textContent, nudge: document.getElementById("nudgeText").textContent})')
             print('test_walk @35%:', json.dumps(info, default=str))
             await page.screenshot(path=f'{OUT}/test_walk_02_mid.png')
             # jump start time back 50 min to simulate being late
@@ -96,30 +97,39 @@ async def main():
             await page.evaluate('SIM.set(1000)'); await page.wait_for_timeout(400)
             await page.screenshot(path=f'{OUT}/test_walk_07_finish.png')
             print('finish:', await page.evaluate('document.getElementById("nextLabel").textContent + " / " + document.getElementById("nextName").textContent + " / " + document.getElementById("nextMeta").textContent'))
-            # check-in link
-            popup_url = {}
-            async def on_popup(pp):
-                popup_url['u'] = pp.url
-            page.on('popup', on_popup)
-            await page.click('#btnCheckin'); await page.wait_for_timeout(600)
-            print('check-in url:', popup_url.get('u', '(none)')[:300])
-            txt = await page.evaluate('''() => { const a = document.createElement('a'); const orig = HTMLElement.prototype.click; let got=null; HTMLElement.prototype.click = function(){ got = this.href; }; document.getElementById('btnCheckin').onclick(); HTMLElement.prototype.click = orig; return decodeURIComponent(got||''); }''')
+            # check-in sheet + message
+            await page.click('#btnCheckin'); await page.wait_for_timeout(300)
+            await page.screenshot(path=f'{OUT}/test_walk_08_checkin.png')
+            txt = await page.evaluate('''() => new Promise(res => { const orig = HTMLElement.prototype.click; HTMLElement.prototype.click = function(){ if (this.href){ HTMLElement.prototype.click = orig; res(decodeURIComponent(this.href)); } else orig.call(this); }; document.getElementById('ciSend').click(); })''')
             print('check-in text:', txt[:400])
+            print('trail:', await page.evaluate('SIM.state.trail.length'), 'points; checked', await page.evaluate('SIM.state.checked'))
 
             # ---------- main walk with real (mocked) geolocation, no sim ----------
             page2 = await ctx.new_page()
             page2.on('console', lambda m: errors.append(('console', m.type, m.text)) if m.type in ('error', 'warning') else None)
             page2.on('pageerror', lambda e: errors.append(('pageerror', str(e))))
+            page2.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
             await page2.goto(f'http://127.0.0.1:{PORT}/freyja_walk/', wait_until='networkidle')
             await page2.wait_for_timeout(1200)
             await page2.screenshot(path=f'{OUT}/freyja_00_open.png')
             print('freyja gps line:', await page2.evaluate('document.getElementById("gps").textContent'))
             await page2.click('#btnStart'); await page2.wait_for_timeout(300)
-            # move to near the Pou
+            print('freyja started:', await page2.evaluate('({checked: JSON.parse(localStorage.getItem("walk:freyja_walk:checked")), trail: JSON.parse(localStorage.getItem("walk:freyja_walk:trail")).length})'))
+            # teleport to the Pou: the speed gate must hold it
             await ctx.set_geolocation({'latitude': -41.29175, 'longitude': 174.78660, 'accuracy': 6})
             await page2.wait_for_timeout(1500)
+            print('freyja teleported (gate):', await page2.evaluate('document.getElementById("gps").textContent'))
+            # walk there properly: 90 m steps along the route (the gate only fires on jumps over 100 m)
+            route = json.loads(open(os.path.join(DIST, 'freyja_walk', 'data.js')).read()[len('window.WALK = '):].rstrip(';\n'))['route']
+            await ctx.set_geolocation({'latitude': route[0][0], 'longitude': route[0][1], 'accuracy': 6}); await page2.wait_for_timeout(400)
+            walked = 0.0; last = route[0]
+            for pt in route[1:]:
+                d = math.hypot((pt[0]-last[0])*111000, (pt[1]-last[1])*83500); walked += d; last = pt
+                if walked > 1200: break
+                await ctx.set_geolocation({'latitude': pt[0], 'longitude': pt[1], 'accuracy': 6}); await page2.wait_for_timeout(120)
+            await page2.wait_for_timeout(800)
             await page2.screenshot(path=f'{OUT}/freyja_01_pou.png')
-            print('freyja at pou:', await page2.evaluate('document.getElementById("nextName").textContent + " | " + document.getElementById("nextMeta").textContent + " | " + document.getElementById("buffer").textContent'))
+            print('freyja after 1.2 km:', await page2.evaluate('document.getElementById("nextName").textContent + " | " + document.getElementById("nextMeta").textContent + " | " + document.getElementById("buffer").textContent + " | " + document.getElementById("gps").textContent + " | nudge: " + document.getElementById("nudgeText").textContent + " [" + document.getElementById("nudge").className + "]"'))
             await page2.click('#btnList'); await page2.wait_for_timeout(300)
             await page2.screenshot(path=f'{OUT}/freyja_02_list.png', full_page=False)
             await page2.click('[data-close=listSheet]')

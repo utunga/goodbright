@@ -689,9 +689,24 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:-apple-system,Bl
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
 header{background:var(--bg);color:#fff;padding:calc(var(--sat) + 8px) 12px 8px;display:flex;align-items:center;gap:10px;flex:0 0 auto}
 header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}
-#clock{font-variant-numeric:tabular-nums;font-size:15px;opacity:.9}
-#buffer{border-radius:999px;padding:4px 10px;font-weight:700;font-size:14px;background:#374151;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}
+#clock{font-variant-numeric:tabular-nums;font-size:17px;font-weight:700;opacity:.95}
+.eta-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:#374151;flex-wrap:wrap;line-height:1.3}
+#buffer{border-radius:999px;padding:5px 11px;font-weight:700;font-size:15px;background:#374151;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}
 #buffer.ok{background:var(--ok)} #buffer.warn{background:var(--warn)} #buffer.bad{background:var(--bad)}
+#nudge{display:none;background:#fef3c7;color:#78350f;padding:8px 12px;font-size:14px;font-weight:600;align-items:center;gap:10px;flex:0 0 auto;line-height:1.3}
+#nudge.show{display:flex}
+#nudge.arrive{background:#dcfce7;color:#14532d}
+#nudge #nudgeText{flex:1 1 auto}
+#nudge button{border:0;border-radius:8px;padding:8px 12px;font-weight:700;font-size:14px;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+#nudgeYes{background:#15803d;color:#fff}
+#nudgeNo{background:#fff;color:#78350f}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.chip{border:2px solid #cbd5e1;background:#fff;border-radius:999px;padding:8px 12px;font-size:15px;font-weight:600;color:var(--ink);-webkit-tap-highlight-color:transparent}
+.chip.on{background:#15803d;border-color:#15803d;color:#fff}
+.chip .d{font-weight:400;opacity:.8}
+.btns.col{flex-direction:column}
+button.mini{border:0;background:#eef2f7;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;-webkit-tap-highlight-color:transparent}
+button.mini.go{background:#15803d;color:#fff}
 #menuBtn{background:transparent;border:0;color:#fff;font-size:22px;padding:2px 6px;line-height:1}
 #map{flex:1 1 auto;min-height:120px;background:#dfe7d8}
 #banner{display:none;background:#fef3c7;color:#78350f;padding:6px 12px;font-size:14px;font-weight:600;text-align:center;flex:0 0 auto}
@@ -719,6 +734,13 @@ header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px;white-spac
 .notes .tag{display:inline-block;background:#f3f4f6;border-radius:6px;padding:2px 7px;margin:2px 4px 2px 0;font-size:13px}
 .notes .tag.leg{background:#fff7ed;color:#7c2d12}
 .notes .tag.brk{background:#ecfdf5;color:#065f46}
+.notes .tag.ci{background:#dbeafe;color:#1e3a8a;font-weight:700}
+.notes .tag.ci.call{background:#fce7f3;color:#831843}
+.ms.ci::after{content:"";position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#1d4ed8;border:2px solid #fff}
+.ms.ci.call::after{background:#be185d}
+.ms{position:relative}
+table.tt .sub.ci{color:#1e3a8a;font-weight:700}
+table.tt .sub.ci.call{color:#831843}
 .gps{font-size:12px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
 .btns{display:flex;gap:8px;margin-top:10px}
 button.big{flex:1 1 auto;border:0;border-radius:12px;padding:13px 10px;font-size:16px;font-weight:700;color:#fff;background:var(--accent);-webkit-tap-highlight-color:transparent}
@@ -743,6 +765,7 @@ button.big:active{filter:brightness(.9)}
 .lm svg{width:18px;height:18px}
 .me{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 0 0 2px rgba(11,107,203,.4),0 1px 4px rgba(0,0,0,.5)}
 .me.stale{background:#9ca3af;box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+.me.rough{opacity:.6}
 .leaflet-tooltip.lbl{background:rgba(255,255,255,.92);border:0;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .leaflet-tooltip.lbl::before{display:none}
 .leaflet-container{font-family:inherit}
@@ -760,7 +783,10 @@ table.tt tr.checked td.n{color:#15803d}
 table.tt tr.next td{background:#fff7ed}
 table.tt td.n{width:26px;font-weight:800;color:var(--route)}
 table.tt td.t{white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
+table.tt td.b{width:1%;text-align:right;padding-left:6px}
 table.tt .sub{display:block;font-size:12px;color:var(--muted)}
+table.tt .sub.q{color:#b45309}
+table.tt .sub.ok{color:#15803d}
 
 .menu button{display:block;width:100%;text-align:left;border:0;background:#f9fafb;border-radius:10px;padding:12px;font-size:15px;margin-bottom:8px;font-weight:600}
 .menu .hint{font-size:13px;color:var(--muted);margin:-4px 0 10px 4px;line-height:1.35}
@@ -779,12 +805,12 @@ table.tt .sub{display:block;font-size:12px;color:var(--muted)}
   <header>
     <h1 id="title">Freyja's Walk</h1>
     <span id="clock">--:--</span>
-    <span id="buffer">not started</span>
     <button id="menuBtn" aria-label="menu">☰</button>
   </header>
   <div id="banner"></div>
   <div id="sim"><span>SIM</span><input type="range" id="simRange" min="0" max="1000" value="0"><button id="simPlay">▶</button><span id="simInfo"></span></div>
   <div id="map"></div>
+  <div id="nudge"><span id="nudgeText"></span><button id="nudgeYes"></button><button id="nudgeNo"></button></div>
   <div id="card">
     <div class="grabzone" id="grabzone"><div class="grab"></div></div>
     <div id="strip"><div class="bar"></div><div class="fill" id="stripFill"></div><div id="stripDots"></div><div class="you" id="stripYou"></div></div>
@@ -793,6 +819,7 @@ table.tt .sub{display:block;font-size:12px;color:var(--muted)}
     <div class="next-name" id="nextName">—</div>
     <div class="next-meta" id="nextMeta">—</div>
     <div class="notes" id="notes"></div>
+    <div class="eta-row" id="etaRow"><span id="buffer">not started</span><span id="etaText"></span></div>
     <div class="gps" id="gps">Waiting for GPS…</div>
     <div class="btns" id="btns"></div>
   </div>
@@ -802,7 +829,18 @@ table.tt .sub{display:block;font-size:12px;color:var(--muted)}
 <div class="sheet" id="listSheet"><div class="inner">
   <button class="close" data-close="listSheet">Close</button>
   <h2>Milestones</h2>
+  <div class="hint" style="margin:0 0 8px" id="dirLink"><a href="directions.html" style="color:#0b6bcb;font-weight:700">Turn-by-turn directions →</a> every street, every left and right.</div>
+  <div class="hint" style="margin:0 0 8px">Green = you checked in there. Grey = passed without checking in. "I'm here" checks you in by hand when the GPS is rough. 📱 = the plan wants a WhatsApp check-in from there, ☎ = call Dad.</div>
   <div id="listBody"></div>
+</div></div>
+
+<div class="sheet" id="ciSheet"><div class="inner">
+  <button class="close" data-close="ciSheet">Cancel</button>
+  <h2 id="ciTitle">Check in</h2>
+  <div class="hint" id="ciGps"></div>
+  <div class="chips" id="ciChips"></div>
+  <div class="hint" id="ciHint"></div>
+  <div class="btns col"><button class="big" id="ciSave">Save point</button><button class="big wa" id="ciSend">Save and send on WhatsApp</button></div>
 </div></div>
 
 <div class="sheet" id="menuSheet"><div class="inner menu">
@@ -816,8 +854,11 @@ table.tt .sub{display:block;font-size:12px;color:var(--muted)}
   <button id="btnFollow">Follow me: on</button>
   <button id="btnPrint">Printable map sheets</button>
   <button id="btnPoster">Whole route on one page</button>
-  <button id="btnCheckin2">Send a check-in</button>
+  <button id="btnDirections">Turn-by-turn directions (street names, lefts and rights)</button>
+  <button id="btnCheckin2">Check in</button>
+  <button id="btnShareTrail">Share the trail (all check-ins as text)</button>
   <button id="btnResetStart">Reset the start (undo the Start button)</button>
+  <div class="hint">Clears the start time, the ticks and the trail of check-ins.</div>
   <div class="hint" id="tileInfo"></div>
   <div class="hint" id="about"></div>
 </div></div>
@@ -839,6 +880,10 @@ const LINZ_KEY = '1b095d00946a4967a289cff2eb6bfbd1';
 const $ = (id) => document.getElementById(id);
 const STORE = 'walk:' + W.slug + ':';
 const R = 6371008.8;
+const GOOD_ACC = 60;        // metres: a rougher fix moves the dot but not her progress along the route
+const TICK_RADIUS = 60;     // metres, plus the fix's own error: how close a check-in must be to tick a milestone
+const PASSED_MARGIN = 150;  // metres past a milestone (and away from it) before the app asks whether she passed it
+const MAX_SPEED = 2.2;      // m/s along the route (8 km/h): a jump faster than this is the GPS, not her
 
 // ---------- geometry ----------
 function hav(a, b){ // [lat,lng]
@@ -874,20 +919,25 @@ function projectAll(p){ // returns array of local minima {d, along}
   if (prev && !prev.emitted) out.push(prev);
   return out;
 }
-let lastAlong = null;
-function progressFor(p){
+let lastAlong = null, lastAlongAt = null;
+function progressFor(p, floor){
+  // where along the route this point most likely is: nearest, with a preference for continuing forward,
+  // and never behind `floor` (the last milestone she checked in at — a tick is better evidence than a fix)
   const cands = projectAll(p);
-  let best = null;
+  const ref = lastAlong !== null ? lastAlong : (floor || 0);   // no fix yet: measure from the last tick (the start of a loop, not its end)
+  let best = null, any = null;
   for (const c of cands){
     let score = c.d;
-    if (lastAlong !== null){
-      const back = lastAlong - c.along;
-      if (back > 150) score += (back - 150) * 0.5;           // going backwards a long way is unlikely
-      const fwd = c.along - lastAlong;
-      if (fwd > 2500) score += (fwd - 2500) * 0.2;           // jumping far forward is unlikely
-    }
+    const back = ref - c.along;
+    if (back > 150) score += (back - 150) * 0.5;           // going backwards a long way is unlikely
+    const fwd = c.along - ref;
+    if (fwd > 2500) score += (fwd - 2500) * 0.2;           // jumping far forward is unlikely
+    score += Math.abs(c.along - ref) * 0.02;               // where two candidates are equally close (out-and-back legs, a loop's two ends), keep continuity
+    if (!any || score < any.score) any = Object.assign({score}, c);
+    if (c.along < (floor || 0) - 30) continue;
     if (!best || score < best.score) best = Object.assign({score}, c);
   }
+  if (!best){ best = Object.assign({}, any); best.along = Math.max(best.along, floor || 0); }
   return best;
 }
 function pointAt(along){
@@ -900,19 +950,30 @@ function pointAt(along){
 }
 
 // ---------- state ----------
+const ls = (k, dflt) => { try { const v = localStorage.getItem(STORE+k); return v === null ? dflt : JSON.parse(v); } catch(e){ return dflt; } };
 const state = {
   startAt: +localStorage.getItem(STORE+'startAt') || null,
-  checked: JSON.parse(localStorage.getItem(STORE+'checked') || '[]'),     // milestones she checked in at (within 60 m)
-  announced: JSON.parse(localStorage.getItem(STORE+'announced') || '[]'), // milestones already toasted as passed
-  pos: null, acc: null, posAt: null,
-  along: null, off: null,
+  checked: ls('checked', []),   // milestones she checked in at: the only thing that turns one green
+  trail: ls('trail', []),       // every check-in: {t, lat, lng, acc, ms, manual, late, sent} — the trail lives on the phone
+  snooze: ls('snooze', {}),     // milestone index → time until which the "passed it?" question stays quiet
+  pos: null, acc: null, posAt: null, gpsNote: '',
+  along: null, off: null,       // GPS estimate of her progress along the route (gated), and distance off the line
   follow: true, layer: localStorage.getItem(STORE+'layer') || 'osm', routeOn: localStorage.getItem(STORE+'route') !== 'off',
   sim: /[?&]sim/.test(location.search),
 };
-const save = () => { localStorage.setItem(STORE+'startAt', state.startAt || ''); localStorage.setItem(STORE+'checked', JSON.stringify(state.checked)); localStorage.setItem(STORE+'announced', JSON.stringify(state.announced)); };
-const clearWalk = () => { state.startAt = null; state.checked = []; state.announced = []; save(); };
+const save = () => { try {
+  localStorage.setItem(STORE+'startAt', state.startAt || '');
+  localStorage.setItem(STORE+'checked', JSON.stringify(state.checked));
+  localStorage.setItem(STORE+'trail', JSON.stringify(state.trail));
+  localStorage.setItem(STORE+'snooze', JSON.stringify(state.snooze));
+} catch(e){} };
+const clearWalk = () => { state.startAt = null; state.checked = []; state.trail = []; state.snooze = {}; save(); };
 let staleCleared = false;
-if (state.startAt && Date.now() - state.startAt > 20*3600*1000){ clearWalk(); staleCleared = true; }
+if (state.startAt && Date.now() - state.startAt > 20*3600*1000){ state.startAt = null; state.checked = []; state.snooze = {}; save(); staleCleared = true; }   // the trail stays until Start or Reset
+
+function lastTick(){ return state.checked.length ? Math.max(...state.checked) : -1; }
+function floorAlong(){ const t = lastTick(); return t >= 0 ? MS[t].along : 0; }
+function nextIndex(){ const n = lastTick() + 1; return n >= MS.length ? null : n; }   // the first milestone she hasn't checked in at
 
 const [nh, nm] = W.nominalStart.split(':').map(Number);
 function plannedStartToday(){ const d = new Date(); d.setHours(nh, nm, 0, 0); return d.getTime(); }
@@ -1012,7 +1073,7 @@ const SVG = {
 };
 const msMarkers = MS.map((m, i) => {
   const html = m.finish ? SVG.tent : String(i);
-  const mk = L.marker([m.lat, m.lng], {icon: L.divIcon({className:'', html:'<div class="ms' + (m.finish?' finish':'') + '" data-i="'+i+'">' + html + '</div>', iconSize:[26,26], iconAnchor:[13,13]}), zIndexOffset: 500});
+  const mk = L.marker([m.lat, m.lng], {icon: L.divIcon({className:'', html:'<div class="ms' + (m.finish?' finish':'') + (m.checkin ? ' ci' + (m.checkin === 'call' ? ' call' : '') : '') + '" data-i="'+i+'">' + html + '</div>', iconSize:[26,26], iconAnchor:[13,13]}), zIndexOffset: 500});
   mk.bindTooltip(m.label + ' · ' + fmt(timeAtOffset(m.offset)), {className:'lbl', direction:'top', offset:[0,-12]});
   mk.on('click', () => showMilestone(i));
   return mk.addTo(map);
@@ -1027,6 +1088,21 @@ for (const p of W.pois){
 }
 const meMarker = L.marker(routeLatLngs[0], {icon: L.divIcon({className:'', html:'<div class="me" id="meDot"></div>', iconSize:[18,18], iconAnchor:[9,9]}), zIndexOffset: 1000, interactive:false});
 const accCircle = L.circle(routeLatLngs[0], {radius:0, color:'#0b6bcb', weight:1, fillOpacity:.08, interactive:false});
+// the trail: her check-ins, straight lines between them, in its own colour and never hidden with the route
+const trailGroup = L.layerGroup().addTo(map);
+function trailLabel(p){
+  return fmt(new Date(p.t)) + (p.ms !== null && p.ms !== undefined ? ' · ' + MS[p.ms].label + ' ✓' : '') + (p.late ? ' (marked later)' : p.manual ? ' (by hand)' : '');
+}
+function drawTrail(){
+  trailGroup.clearLayers();
+  const pts = state.trail.map(p => [p.lat, p.lng]);
+  if (pts.length > 1) L.polyline(pts, {color:'#1d4ed8', weight:3, opacity:.85, dashArray:'1 8', lineCap:'round', lineJoin:'round', interactive:false}).addTo(trailGroup);
+  for (const p of state.trail){
+    L.circleMarker([p.lat, p.lng], {radius:5, color:'#1d4ed8', weight:2, fillColor:'#fff', fillOpacity:1})
+      .bindTooltip(trailLabel(p), {className:'lbl', direction:'top', offset:[0,-8]}).addTo(trailGroup);
+  }
+}
+drawTrail();
 map.fitBounds(routeLine.getBounds(), {padding:[20,20]});
 if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize({pan:false})).observe($('map'));
 map.on('dragstart', () => { if (state.follow) setFollow(false); });
@@ -1053,43 +1129,91 @@ function onPosErr(e){
   $('gps').textContent = e.code === 1 ? 'Location is blocked. Allow location for this page in Settings › Safari (or Chrome) › Location.' : 'Waiting for GPS… (' + e.message + ')';
 }
 function onPos(p){ handlePosition([p.coords.latitude, p.coords.longitude], p.coords.accuracy, p.timestamp); }
+let jumpSince = null;
 function handlePosition(latlng, acc, ts){
-  state.pos = latlng; state.acc = acc; state.posAt = ts || Date.now();
+  const now = ts || Date.now();
+  state.pos = latlng; state.acc = acc; state.posAt = now; state.gpsNote = '';
   if (!map.hasLayer(meMarker)){ meMarker.addTo(map); accCircle.addTo(map); }
   meMarker.setLatLng(latlng); accCircle.setLatLng(latlng); accCircle.setRadius(acc || 0);
-  const pr = progressFor(toXY(latlng));
-  state.along = pr.along; state.off = pr.d; lastAlong = pr.along;
-  if (!state.startAt && pr.d < 120 && state.along > 250 && state.along < 3000 && Math.abs(Date.now() - plannedStartToday()) < 90*60000){
-    // she's walking and forgot to press Start: assume she's on plan right now
-    state.startAt = Date.now() - expectedElapsed(state.along, null)*60000; state.checked = []; state.announced = []; save(); refreshTooltips();
-    toast('Started automatically — start time set to ' + fmt(new Date(state.startAt)), 6000);
-  }
-  if (state.startAt && pr.d < 150){
-    // a quiet note as she passes each milestone; ticks only come from check-ins
-    const p = passedIndex();
-    for (let i=1;i<=p;i++){
-      if (state.announced.includes(i)) continue;
-      state.announced.push(i); save();
-      if (i === p) toast(MS[i].finish ? 'You made it: ' + MS[i].label + '!' : (hav(latlng, [MS[i].lat, MS[i].lng]) < 60 ? "You're at " : 'Passing ') + i + ' ' + MS[i].label, 4000);
+  const dot = $('meDot'); if (dot) dot.classList.toggle('rough', (acc || 0) > GOOD_ACC);
+  if ((acc || 0) > GOOD_ACC){
+    // the dot moves, the progress does not: a ±140 m fix put her a kilometre up the road on the first test
+    state.gpsNote = 'too rough to place you on the route';
+  } else {
+    const pr = progressFor(toXY(latlng), floorAlong());
+    const dt = lastAlongAt !== null ? (now - lastAlongAt)/1000 : 0;
+    const jump = lastAlong === null ? 0 : pr.along - lastAlong;
+    if (jump > 100 && dt > 0 && jump/dt > MAX_SPEED && (jumpSince === null || now - jumpSince < 60000)){
+      // faster than anyone walks: hold the progress and see if the fix holds for a minute
+      if (jumpSince === null) jumpSince = now;
+      state.gpsNote = 'ignoring a jump of ' + fmtKm(jump) + ' — waiting to see if it holds';
+    } else {
+      jumpSince = null;
+      state.along = pr.along; state.off = pr.d; lastAlong = pr.along; lastAlongAt = now;
+      if (!state.startAt && pr.d < 120 && state.along > 250 && state.along < 3000 && Math.abs(Date.now() - plannedStartToday()) < 90*60000){
+        // she's walking and forgot to press Start: assume she's on plan right now
+        state.startAt = Date.now() - expectedElapsed(state.along, null)*60000; save(); refreshTooltips();
+        toast('Started automatically — start time set to ' + fmt(new Date(state.startAt)), 6000);
+      }
     }
   }
   if (state.follow) map.setView(latlng, Math.max(map.getZoom(), 15), {animate:true});
   render();
 }
 
-// ---------- rendering ----------
-function passedIndex(){
-  // the last milestone she is at or beyond, from her position along the route; without GPS, the last one she checked in at
-  if (state.along !== null){
-    let p = 0;
-    for (let i=1;i<MS.length;i++){ if (state.along >= MS[i].along - 30 || (state.pos && hav(state.pos, [MS[i].lat, MS[i].lng]) < 60)) p = i; }
-    return p;
-  }
-  return state.checked.length ? Math.max(...state.checked) : 0;
+// ---------- ticks and the trail ----------
+function addPoint(pt){ state.trail.push(pt); save(); drawTrail(); return pt; }
+function tick(i, opts){
+  // a check-in at milestone i. opts.pos/acc: the fix to record (used if it's within range of the milestone),
+  // opts.manual: she said so herself, opts.late: marked after the fact
+  opts = opts || {};
+  const m = MS[i];
+  const usePos = opts.pos && hav(opts.pos, [m.lat, m.lng]) < TICK_RADIUS + (opts.acc || 0);
+  const pt = {t: Date.now(), lat: usePos ? opts.pos[0] : m.lat, lng: usePos ? opts.pos[1] : m.lng, acc: usePos ? Math.round(opts.acc || 0) : null, ms: i, manual: !!opts.manual, late: !!opts.late, sent: false};
+  if (!state.checked.includes(i)) state.checked.push(i);
+  delete state.snooze[i];
+  if (state.along === null || state.along < m.along){ state.along = m.along; lastAlong = m.along; lastAlongAt = Date.now(); }   // a tick is better evidence than a fix
+  addPoint(pt);
+  return pt;
 }
-function nextIndex(){
-  const p = passedIndex();
-  return p >= MS.length - 1 ? null : p + 1;
+function untick(i){
+  state.checked = state.checked.filter(x => x !== i);
+  for (let k = state.trail.length-1; k >= 0; k--){ if (state.trail[k].ms === i){ state.trail.splice(k, 1); break; } }
+  save(); drawTrail();
+}
+function pointTime(i){ for (let k = state.trail.length-1; k >= 0; k--) if (state.trail[k].ms === i) return state.trail[k]; return null; }
+function askText(m){
+  // what the plan asks for at this milestone, in her words
+  if (m.checkin === 'send') return 'send a check-in';
+  if (m.checkin === 'test') return 'test check-in — make sure it sends';
+  if (m.checkin === 'call') return 'call Dad';
+  return '';
+}
+function cleanFix(){ return state.pos && (state.acc || 0) <= GOOD_ACC && state.along !== null; }
+function impliedPassed(i){
+  // grey: passed without a check-in — either a later milestone is ticked, or a clean fix puts her well past it
+  if (state.checked.includes(i)) return false;
+  if (i < lastTick()) return true;
+  return cleanFix() && state.along >= MS[i].along + PASSED_MARGIN && hav(state.pos, [MS[i].lat, MS[i].lng]) > PASSED_MARGIN;
+}
+function nudgeFor(){
+  // one question at a time, about the next unticked milestone: is she at it, or has she passed it?
+  const k = nextIndex();
+  if (k === null || !state.pos || (state.acc || 0) > GOOD_ACC) return null;
+  if (state.snooze[k] && Date.now() < state.snooze[k]) return null;
+  const m = MS[k], d = hav(state.pos, [m.lat, m.lng]);
+  if (d < TICK_RADIUS + (state.acc || 0)) return {k, kind:'arrive'};
+  if (state.along !== null && state.along >= m.along + PASSED_MARGIN && d > PASSED_MARGIN) return {k, kind:'passed'};
+  return null;
+}
+
+// ---------- rendering ----------
+function alongIndex(){
+  // the last milestone at or before her GPS position — describes where she is, decides nothing
+  if (state.along === null) return lastTick() < 0 ? 0 : lastTick();
+  let p = 0;
+  for (let i=1;i<MS.length;i++) if (state.along >= MS[i].along - 30) p = i;
+  return p;
 }
 function nearIndex(){
   // the milestone she is standing at (within 60 m); where two share a spot (a loop back to the start),
@@ -1133,14 +1257,17 @@ function render(){
     bEl.textContent = 'buffer ' + fmtMin(bi.buffer);
     bEl.classList.add(bi.buffer >= W.bufferMin*0.3 ? 'ok' : bi.buffer >= 5 ? 'warn' : 'bad');
   }
+  $('etaText').innerHTML = bi ? FINAL.label + ' ETA <b>' + fmt(bi.finishEta) + '</b> · plan ' + fmt(timeAtOffset(FINAL.offset)) + ' · be there by ' + fmt(new Date(deadlineTime()))
+                             : (state.startAt ? 'waiting for a GPS fix to work out the ETA' : 'plan: ' + FINAL.label + ' ' + fmt(timeAtOffset(FINAL.offset)) + ', be there by ' + fmt(new Date(deadlineTime())));
   const ni = nextIndex();
   const nearI = nearIndex();
-  const pIdx = passedIndex();
+  const lt = lastTick();
   const done = ni === null;
   let label, name, meta = '', notes = '';
   if (done){
     label = 'Finished'; name = FINAL.label;
     meta = 'You did it — ' + fmtKm(TOTAL) + ' on foot' + (state.startAt ? ', started ' + fmt(new Date(state.startAt)) : '') + '.';
+    if (FINAL.checkin) notes = '<span class="tag ci' + (FINAL.checkin === 'call' ? ' call' : '') + '">' + (FINAL.checkin === 'call' ? '☎ ' : '📱 ') + askText(FINAL) + (FINAL.checkinNote ? ' — ' + FINAL.checkinNote : '') + '</span>';
   } else {
     const m = MS[ni];
     const prev = MS[ni-1];
@@ -1149,9 +1276,10 @@ function render(){
     const due = timeAtOffset(m.offset);
     let parts = [];
     if (state.along !== null){
-      const rem = Math.max(0, m.along - state.along);
-      parts.push('<b>' + fmtKm(rem) + '</b> to go');
-    } else {
+      const rem = m.along - state.along;
+      if (rem >= -PASSED_MARGIN) parts.push('<b>' + fmtKm(Math.max(0, rem)) + '</b> to go');
+      else parts.push('<b>looks behind you</b> — check in at it or say so in the list');
+    } else if (prev){
       parts.push(fmtKm(m.along - prev.along) + ' leg');
     }
     parts.push('due <b>' + fmt(due) + '</b>');
@@ -1160,22 +1288,26 @@ function render(){
     }
     meta = parts.join(' · ');
     const tags = [];
-    if (nearI !== null && MS[nearI].break && state.startAt && nearI === ni - 1){
+    if (nearI !== null && MS[nearI].break && state.startAt && nearI === lt){
       tags.push('<span class="tag brk">You\'re at ' + MS[nearI].label + ': ' + MS[nearI].break + ' min break' + (MS[nearI].note ? ' — ' + MS[nearI].note : '') + '. Plan says leave by ' + fmt(timeAtOffset(MS[nearI].offset + MS[nearI].break)) + '</span>');
     }
+    if (nearI !== null && nearI === lt && MS[nearI].checkin){
+      tags.push('<span class="tag ci' + (MS[nearI].checkin === 'call' ? ' call' : '') + '">' + (MS[nearI].checkin === 'call' ? '☎ ' : '📱 ') + 'You\'re at ' + MS[nearI].label + ': ' + askText(MS[nearI]) + (MS[nearI].checkinNote ? ' — ' + MS[nearI].checkinNote : '') + '</span>');
+    }
+    if (m.checkin) tags.push('<span class="tag ci' + (m.checkin === 'call' ? ' call' : '') + '">' + (m.checkin === 'call' ? '☎ ' : '📱 ') + 'at ' + m.label + ': ' + askText(m) + '</span>');
     if (m.legNote) tags.push('<span class="tag leg">this leg: ' + m.legNote + '</span>');
     if (m.break) tags.push('<span class="tag brk">' + m.break + ' min break there' + (m.note ? ' — ' + m.note : '') + '</span>');
     else if (m.note) tags.push('<span class="tag">' + m.note + '</span>');
-    if (bi && ni < MS.length){
-      tags.push('<span class="tag">' + FINAL.label + ' ETA <b>' + fmt(bi.finishEta) + '</b> · plan ' + fmt(timeAtOffset(FINAL.offset)) + ' · be there by ' + fmt(new Date(deadlineTime())) + '</span>');
-    }
     notes = tags.join('');
   }
   $('nextLabel').textContent = label; $('nextName').textContent = name; $('nextMeta').innerHTML = meta; $('notes').innerHTML = notes;
   // gps line
   if (state.pos){
     const age = (Date.now() - state.posAt)/1000;
-    $('gps').textContent = 'GPS ±' + Math.round(state.acc||0) + ' m' + (age > 60 ? ' · last fix ' + Math.round(age/60) + ' min ago' : '') + (state.along !== null ? ' · ' + fmtKm(state.along) + ' of ' + fmtKm(TOTAL) + ' walked' : '');
+    $('gps').textContent = 'GPS ±' + Math.round(state.acc||0) + ' m' + (age > 60 ? ' · last fix ' + Math.round(age/60) + ' min ago' : '')
+      + (state.gpsNote ? ' · ' + state.gpsNote : '')
+      + (state.along !== null ? ' · ' + fmtKm(state.along) + ' of ' + fmtKm(TOTAL) + ' walked' : '')
+      + (state.trail.length ? ' · ' + state.trail.length + ' check-in' + (state.trail.length === 1 ? '' : 's') : '');
     const dot = $('meDot'); if (dot) dot.classList.toggle('stale', age > 90);
   }
   // off route banner
@@ -1183,18 +1315,36 @@ function render(){
   if (state.pos && state.off !== null && state.off > 150 && (state.acc||0) < 100){
     ban.textContent = 'You are about ' + fmtKm(state.off) + ' from the route'; ban.className = 'show' + (state.off > 400 ? ' bad' : '');
   } else ban.className = '';
-  // done line
+  // the one question: at the next milestone, or past it?
+  const nd = nudgeFor();
+  const nEl = $('nudge');
+  if (nd){
+    const m = MS[nd.k];
+    nEl.className = 'show' + (nd.kind === 'arrive' ? ' arrive' : '');
+    $('nudgeText').textContent = nd.kind === 'arrive' ? (m.finish ? 'At ' + m.label + '?' : 'At ' + m.label + '?') : 'Passed ' + m.label + ' without checking in?';
+    const sends = nd.kind === 'arrive' && (m.checkin === 'send' || m.checkin === 'test');
+    $('nudgeYes').textContent = nd.kind === 'arrive' ? (sends ? 'Check in & send' : 'Check in') : 'I was there';
+    $('nudgeNo').textContent = nd.kind === 'arrive' ? 'Not yet' : 'No';
+    $('nudgeYes').onclick = () => {
+      if (nd.kind === 'arrive'){ const pt = tick(nd.k, {pos: state.pos, acc: state.acc}); if (sends){ pt.sent = true; save(); } }
+      else tick(nd.k, {pos: null, manual: true, late: true});
+      toast((m.finish ? 'You made it: ' : 'Checked in at ') + m.label + ' ✓' + (m.checkin === 'call' ? ' — now call Dad' : ''), 5000); render();
+      if (sends) openWA(checkInText(nd.k));
+    };
+    $('nudgeNo').onclick = () => { state.snooze[nd.k] = Date.now() + (nd.kind === 'arrive' ? 10 : 30)*60000; save(); render(); };
+  } else nEl.className = '';
+  // done line: where the GPS says she has walked
   if (state.along !== null){
     const pts = []; let i = 0;
     while (i < CUM.length && CUM[i] <= state.along){ pts.push(routeLatLngs[i]); i++; }
     pts.push(pointAt(state.along));
     doneLine.setLatLngs(pts);
   }
-  // marker classes
+  // marker classes: green = checked in, grey = passed without checking in, orange = next
   msMarkers.forEach((mk, i) => {
     const el = mk.getElement(); if (!el) return;
     const d = el.querySelector('.ms'); if (!d) return;
-    d.classList.toggle('done', i <= pIdx && !state.checked.includes(i) && !MS[i].finish);
+    d.classList.toggle('done', impliedPassed(i) && !MS[i].finish);
     d.classList.toggle('checked', state.checked.includes(i));
     d.classList.toggle('next', i === ni);
     mk.setZIndexOffset(i === ni ? 900 : 500);
@@ -1205,39 +1355,64 @@ function render(){
     MS.forEach((m, i) => { const d = document.createElement('div'); d.className = 'dot' + (m.break ? ' brk' : ''); d.style.left = (100*m.along/TOTAL) + '%'; d.title = m.label; dotsEl.appendChild(d); });
     $('stripLbl').lastElementChild.textContent = FINAL.label + ' · ' + fmtKm(TOTAL);
   }
-  dotsEl.querySelectorAll('.dot').forEach((d, i) => { d.classList.toggle('done', i <= pIdx && !state.checked.includes(i)); d.classList.toggle('checked', state.checked.includes(i)); });
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => { d.classList.toggle('done', impliedPassed(i)); d.classList.toggle('checked', state.checked.includes(i)); });
   if (state.along !== null){ $('stripFill').style.width = (100*state.along/TOTAL) + '%'; const y = $('stripYou'); y.style.display = 'block'; y.style.left = (100*state.along/TOTAL) + '%'; }
-  // buttons
+  // buttons — the check-in button says what it will do
   const b = $('btns');
+  const cand = checkInCandidates();
+  const ciLabel = (cand.length && (state.acc || 0) <= GOOD_ACC) ? 'Check in at ' + MS[cand[0].i].label : 'Check in';
   if (!state.startAt){
-    b.innerHTML = '<button class="big start" id="btnStart">Start the walk</button><button class="big wa" id="btnCheckin">Check in</button><button class="big ghost" id="btnList">List</button>';
+    b.innerHTML = '<button class="big start" id="btnStart">Start the walk</button><button class="big wa" id="btnCheckin"></button><button class="big ghost" id="btnList">List</button>';
     $('btnStart').onclick = () => {
       if (!confirm('Start the walk now (' + fmt(new Date()) + ')? Every planned time shifts to this start. You can undo it in the menu.')) return;
-      state.startAt = Date.now(); state.checked = (state.pos && hav(state.pos, [MS[0].lat, MS[0].lng]) < 60) ? [0] : []; state.announced = []; save(); toast('Started ' + fmt(new Date()) + '. Go well!'); refreshTooltips(); render();
+      state.startAt = Date.now(); state.checked = []; state.trail = []; state.snooze = {}; save();
+      if (state.pos && hav(state.pos, [MS[0].lat, MS[0].lng]) < TICK_RADIUS + Math.min(state.acc || 0, 200)) tick(0, {pos: state.pos, acc: state.acc});
+      else drawTrail();
+      toast('Started ' + fmt(new Date()) + '. Go well!'); refreshTooltips(); render();
     };
-    $('btnCheckin').onclick = checkIn;
   } else {
-    b.innerHTML = '<button class="big wa" id="btnCheckin">Check in</button><button class="big ghost" id="btnList">Milestones</button>';
-    $('btnCheckin').onclick = checkIn;
+    b.innerHTML = '<button class="big wa" id="btnCheckin"></button><button class="big ghost" id="btnList">Milestones</button>';
   }
+  $('btnCheckin').textContent = ciLabel;
+  $('btnCheckin').onclick = openCheckIn;
   $('btnList').onclick = () => { renderList(); $('listSheet').classList.add('show'); };
 }
 function refreshTooltips(){
   msMarkers.forEach((mk, i) => mk.setTooltipContent(MS[i].label + ' · ' + fmt(timeAtOffset(MS[i].offset))));
 }
 function renderList(){
-  const ni = nextIndex(), pIdx = passedIndex();
+  const ni = nextIndex();
   let h = '<table class="tt">';
   MS.forEach((m, i) => {
-    const cls = state.checked.includes(i) ? 'checked' : (i <= pIdx ? 'done' : (i === ni ? 'next' : ''));
-    h += '<tr class="' + cls + '" data-i="' + i + '"><td class="n">' + (state.checked.includes(i) ? '✓' : (m.finish ? '⛺' : i)) + '</td><td>' + m.label +
+    const chk = state.checked.includes(i), imp = impliedPassed(i);
+    const cls = chk ? 'checked' : (imp ? 'done' : (i === ni ? 'next' : ''));
+    let status = '';
+    if (chk){ const p = pointTime(i); status = '<span class="sub ok">checked in ' + (p ? fmt(new Date(p.t)) + (p.late ? ' (marked later)' : '') : '') + (state.startAt ? ' · plan ' + fmt(timeAtOffset(m.offset)) : '') + '</span>'; }
+    else if (imp) status = '<span class="sub q">passed? — not checked in</span>';
+    if (m.checkin) status += '<span class="sub ci' + (m.checkin === 'call' ? ' call' : '') + '">' + (m.checkin === 'call' ? '☎ ' : '📱 ') + askText(m) + (m.checkinNote ? ' — ' + m.checkinNote : '') + '</span>';
+    const btn = chk ? '<button class="mini" data-undo="' + i + '">undo</button>'
+                    : (imp ? '<button class="mini go" data-here="' + i + '" data-late="1">I was there</button>' : '<button class="mini' + (i === ni ? ' go' : '') + '" data-here="' + i + '">I\'m here</button>');
+    h += '<tr class="' + cls + '" data-i="' + i + '"><td class="n">' + (chk ? '✓' : (m.finish ? '⛺' : i)) + '</td><td>' + m.label + status +
       (m.break ? '<span class="sub">' + m.break + ' min break' + (m.note ? ' — ' + m.note : '') + '</span>' : (m.note ? '<span class="sub">' + m.note + '</span>' : '')) +
       (m.legNote ? '<span class="sub">leg: ' + m.legNote + '</span>' : '') +
-      '</td><td class="t">' + fmt(timeAtOffset(m.offset)) + '<span class="sub">' + fmtKm(m.along) + '</span></td></tr>';
+      '</td><td class="t">' + fmt(timeAtOffset(m.offset)) + '<span class="sub">' + fmtKm(m.along) + '</span></td><td class="b">' + btn + '</td></tr>';
   });
   h += '</table>';
   $('listBody').innerHTML = h;
   $('listBody').querySelectorAll('tr').forEach(tr => tr.onclick = () => { $('listSheet').classList.remove('show'); showMilestone(+tr.dataset.i); });
+  $('listBody').querySelectorAll('[data-here]').forEach(bt => bt.onclick = (e) => {
+    e.stopPropagation();
+    const i = +bt.dataset.here, late = !!bt.dataset.late, m = MS[i];
+    if (!confirm(late ? 'Mark ' + m.label + ' as passed? (time unknown — it will be marked at ' + fmt(new Date()) + ')' : 'Check in at ' + m.label + ' now, ' + fmt(new Date()) + '?')) return;
+    tick(i, late ? {pos: null, manual: true, late: true} : {pos: state.pos, acc: state.acc, manual: true});
+    toast('Checked in at ' + m.label + ' ✓', 4000); renderList(); render();
+  });
+  $('listBody').querySelectorAll('[data-undo]').forEach(bt => bt.onclick = (e) => {
+    e.stopPropagation();
+    const i = +bt.dataset.undo;
+    if (!confirm('Undo the check-in at ' + MS[i].label + '?')) return;
+    untick(i); renderList(); render();
+  });
 }
 function showMilestone(i){
   setFollow(false);
@@ -1246,28 +1421,110 @@ function showMilestone(i){
 }
 
 // ---------- check-in ----------
-function checkIn(){
-  const parts = [W.title + ' check-in ' + fmt(new Date()) + (state.startAt ? '.' : ' (not started yet).')];
-  const nearI = nearIndex();
-  if (nearI !== null){
-    // a check-in within 60 m of a milestone is what ticks it
-    const m = MS[nearI];
-    parts.push('At ' + (m.finish ? '' : 'milestone ' + nearI + ', ') + m.label + (state.startAt ? ' (plan said ' + fmt(timeAtOffset(m.offset)) + ')' : '') + '.');
-    if (!state.checked.includes(nearI)){ state.checked.push(nearI); save(); toast('Checked in at ' + m.label + ' ✓', 4000); render(); }
-  } else if (state.along !== null){
-    const p = passedIndex(), n = nextIndex();
-    if (n === null) parts.push('Near the finish, ' + FINAL.label + '.');
-    else parts.push('Between ' + MS[p].label + ' and ' + MS[n].label + ': ' + fmtKm(Math.max(0, state.along - MS[p].along)) + ' past ' + MS[p].label + ', ' + fmtKm(Math.max(0, MS[n].along - state.along)) + ' to ' + MS[n].label + ' (due ' + fmt(timeAtOffset(MS[n].offset)) + ').');
+// A check-in drops a point on the trail. If she is at a milestone it ticks that milestone too.
+// Sending the WhatsApp message is optional and comes second.
+function checkInCandidates(){
+  // milestones within range of the fix, nearest first; a rough fix widens the ring but she has to say she's there
+  if (!state.pos) return [];
+  const r = TICK_RADIUS + Math.min(state.acc || 0, 200);
+  return MS.map((m, i) => ({i, d: hav(state.pos, [m.lat, m.lng])})).filter(c => c.d < r).sort((a, b) => a.d - b.d).slice(0, 3);
+}
+const ci = {ms: null, cands: []};
+function openWA(text){
+  const a = document.createElement('a'); a.href = 'https://wa.me/?text=' + encodeURIComponent(text); a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+function whereText(sel){
+  // one sentence on where she is, for the message
+  if (sel !== null && sel !== undefined){
+    const m = MS[sel];
+    let s = 'At ' + (m.finish ? '' : 'milestone ' + sel + ', ') + m.label;
+    if (state.startAt){ const late = Math.round((Date.now() - timeAtOffset(m.offset).getTime())/60000); s += ' (plan said ' + fmt(timeAtOffset(m.offset)) + (Math.abs(late) < 2 ? ', on time' : late > 0 ? ', ' + fmtMin(late) + ' late' : ', ' + fmtMin(-late) + ' early') + ')'; }
+    return s + '.';
   }
+  if (state.along !== null){
+    const p = alongIndex(), n = p + 1 < MS.length ? p + 1 : null;
+    if (n === null) return 'Near the finish, ' + FINAL.label + '.';
+    return 'Between ' + MS[p].label + ' and ' + MS[n].label + ': ' + fmtKm(Math.max(0, state.along - MS[p].along)) + ' past ' + MS[p].label + ', ' + fmtKm(Math.max(0, MS[n].along - state.along)) + ' to ' + MS[n].label + ' (due ' + fmt(timeAtOffset(MS[n].offset)) + ').';
+  }
+  return '';
+}
+function checkInText(sel){
+  const parts = [W.title + ' check-in ' + fmt(new Date()) + (state.startAt ? '.' : ' (not started yet).')];
+  const w = whereText(sel); if (w) parts.push(w);
   const bi = bufferInfo();
   if (bi) parts.push(FINAL.label + ' ETA ' + fmt(bi.finishEta) + ', buffer ' + fmtMin(bi.buffer) + '.');
-  if (state.pos) parts.push('I am here: https://maps.google.com/?q=' + state.pos[0].toFixed(5) + ',' + state.pos[1].toFixed(5) + (state.acc ? ' (±' + Math.round(state.acc) + ' m)' : ''));
-  else parts.push('(no GPS fix yet)');
-  const text = parts.join(' ');
-  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
-  const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+  if (state.pos) parts.push('I am here: https://maps.google.com/?q=' + state.pos[0].toFixed(5) + ',' + state.pos[1].toFixed(5) + (state.acc ? ' (±' + Math.round(state.acc) + ' m' + ((state.acc || 0) > GOOD_ACC ? ', rough' : '') + ')' : ''));
+  else parts.push('(no GPS fix)');
+  return parts.join(' ');
 }
-$('btnCheckin2').onclick = () => { $('menuSheet').classList.remove('show'); checkIn(); };
+function ciRender(){
+  const chips = $('ciChips'); chips.innerHTML = '';
+  const rough = (state.acc || 0) > GOOD_ACC;
+  $('ciTitle').textContent = 'Check in · ' + fmt(new Date());
+  $('ciGps').textContent = state.pos ? ('GPS ±' + Math.round(state.acc || 0) + ' m' + (rough ? ' — rough' : '') + (state.along !== null ? ' · ' + fmtKm(state.along) + ' along the route' : '')) : 'No GPS fix. The point can\'t be saved; a message can still be sent.';
+  for (const c of ci.cands){
+    const m = MS[c.i], on = ci.ms === c.i;
+    const b = document.createElement('button'); b.className = 'chip' + (on ? ' on' : '');
+    b.innerHTML = (state.checked.includes(c.i) ? '✓ ' : '') + m.label + ' <span class="d">' + Math.round(c.d) + ' m away</span>';
+    b.onclick = () => { ci.ms = on ? null : c.i; ciRender(); };
+    chips.appendChild(b);
+  }
+  if (ci.cands.length){
+    const b = document.createElement('button'); b.className = 'chip' + (ci.ms === null ? ' on' : ''); b.textContent = 'Not at a milestone';
+    b.onclick = () => { ci.ms = null; ciRender(); };
+    chips.appendChild(b);
+  }
+  $('ciHint').textContent = !state.pos ? '' : (ci.cands.length ? (rough ? 'The GPS is rough here. Tap the milestone only if you are really standing at it.' : 'Saving with a milestone selected ticks it green.') : 'Not near a milestone: this saves a point on your trail' + (state.along !== null ? ' — ' + whereText(null).replace(/\.$/, '') : '') + '.');
+  const sel = ci.ms !== null ? MS[ci.ms] : null;
+  $('ciSave').textContent = sel ? 'Save point at ' + sel.label : 'Save point';
+  $('ciSave').disabled = !state.pos;
+  $('ciSend').textContent = (sel ? 'Save and send' : (state.pos ? 'Save and send' : 'Send')) + ' on WhatsApp' + (sel && (sel.checkin === 'send' || sel.checkin === 'test') ? ' ← the plan wants this one' : '');
+}
+function openCheckIn(){
+  ci.cands = checkInCandidates();
+  ci.ms = (ci.cands.length && (state.acc || 0) <= GOOD_ACC) ? ci.cands[0].i : null;   // a clean fix at a milestone: preselect it; a rough one: she decides
+  ciRender();
+  $('ciSheet').classList.add('show');
+}
+function doCheckIn(send){
+  const sel = ci.ms;
+  let pt = null;
+  if (sel !== null && state.pos){
+    pt = tick(sel, {pos: state.pos, acc: state.acc, manual: (state.acc || 0) > GOOD_ACC});
+  } else if (state.pos){
+    pt = addPoint({t: Date.now(), lat: state.pos[0], lng: state.pos[1], acc: Math.round(state.acc || 0), ms: null, manual: false, late: false, sent: false});
+  }
+  if (pt && send){ pt.sent = true; save(); }
+  $('ciSheet').classList.remove('show');
+  if (pt) toast(sel !== null ? (MS[sel].finish ? 'You made it: ' : 'Checked in at ') + MS[sel].label + ' ✓' : 'Point saved to your trail', 3500);
+  render();
+  if (send) openWA(checkInText(sel));
+}
+$('ciSave').onclick = () => doCheckIn(false);
+$('ciSend').onclick = () => doCheckIn(true);
+$('btnCheckin2').onclick = () => { $('menuSheet').classList.remove('show'); openCheckIn(); };
+
+function trailText(){
+  const lines = [W.title + ' trail' + (state.startAt ? ', started ' + fmt(new Date(state.startAt)) : '') + ' (' + new Date().toLocaleDateString() + ')'];
+  for (const p of state.trail){
+    let s = fmt(new Date(p.t)) + '  ';
+    if (p.ms !== null && p.ms !== undefined){
+      const m = MS[p.ms]; s += m.label + ' ✓';
+      if (state.startAt && !p.late){ const late = Math.round((p.t - timeAtOffset(m.offset).getTime())/60000); s += ' (plan ' + fmt(timeAtOffset(m.offset)) + (Math.abs(late) < 2 ? ', on time' : late > 0 ? ', ' + fmtMin(late) + ' late' : ', ' + fmtMin(-late) + ' early') + ')'; }
+      if (p.late) s += ' (marked later)'; else if (p.manual) s += ' (by hand)';
+    } else s += 'point';
+    s += '  ' + p.lat.toFixed(5) + ',' + p.lng.toFixed(5) + (p.acc ? ' ±' + p.acc + ' m' : '') + (p.sent ? '  sent' : '');
+    lines.push(s);
+  }
+  if (!state.trail.length) lines.push('(no check-ins yet)');
+  return lines.join('\n');
+}
+$('btnShareTrail').onclick = () => {
+  const text = trailText();
+  $('menuSheet').classList.remove('show');
+  if (navigator.share){ navigator.share({title: W.title + ' trail', text}).catch(() => openWA(text)); }
+  else openWA(text);
+};
 
 // ---------- menu ----------
 $('menuBtn').onclick = () => $('menuSheet').classList.add('show');
@@ -1278,7 +1535,9 @@ $('btnLayer').onclick = () => { const i = layerCycle.indexOf(curLayer); setLayer
 $('btnFollow').onclick = () => setFollow(!state.follow);
 $('btnPrint').onclick = () => { location.href = 'print.html'; };
 $('btnPoster').onclick = () => { location.href = 'overview.html'; };
-$('btnResetStart').onclick = () => { if (confirm('Reset the start? Check-ins will be cleared too.')){ clearWalk(); refreshTooltips(); render(); $('menuSheet').classList.remove('show'); } };
+$('btnDirections').onclick = () => { location.href = 'directions.html'; };
+if (!true){ $('btnDirections').style.display = 'none'; $('dirLink').style.display = 'none'; }
+$('btnResetStart').onclick = () => { if (confirm('Reset the start? The ticks and the trail of check-ins will be cleared too.')){ clearWalk(); lastAlong = null; lastAlongAt = null; drawTrail(); refreshTooltips(); render(); $('menuSheet').classList.remove('show'); } };
 $('about').innerHTML = 'Route ' + fmtKm(TOTAL) + ' · ' + MS.length + ' milestones · plan ' + fmt(timeAtOffset(0)) + ' → ' + fmt(timeAtOffset(FINAL.offset)) + ' with a ' + W.bufferMin + ' min buffer' + (W.deadlineLabel ? ' (' + W.deadlineLabel + ')' : '') + '.<br>Map data © LINZ Topo50 (CC BY 4.0), © OpenStreetMap contributors.';
 
 function toast(msg, ms){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms || 3500); }
@@ -1344,11 +1603,13 @@ if ('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').cat
 if (state.sim){
   $('sim').classList.add('show');
   let playing = false, t = 0;
-  const upd = () => { const along = t/1000*TOTAL; const ll = pointAt(along); const jitter = 0.00004; handlePosition([ll[0] + (Math.random()-.5)*jitter, ll[1] + (Math.random()-.5)*jitter], 12, Date.now()); $('simInfo').textContent = fmtKm(along); };
+  const SIM_T0 = Date.now();
+  // the slider pretends time passes at walking pace (1.4 m/s), so the speed gate sees a walker, not a teleport
+  const upd = () => { const along = t/1000*TOTAL; const ll = pointAt(along); const jitter = 0.00004; handlePosition([ll[0] + (Math.random()-.5)*jitter, ll[1] + (Math.random()-.5)*jitter], 12, SIM_T0 + along/1.4*1000); $('simInfo').textContent = fmtKm(along); };
   $('simRange').oninput = (e) => { t = +e.target.value; upd(); };
   $('simPlay').onclick = () => { playing = !playing; $('simPlay').textContent = playing ? '❚❚' : '▶'; };
   setInterval(() => { if (playing){ t = Math.min(1000, t + 1); $('simRange').value = t; upd(); } }, 400);
-  window.SIM = {set:(v)=>{ t=v; $('simRange').value=v; upd(); }, setPos:(la,ln,acc)=>handlePosition([la,ln],acc||10,Date.now()), state, bufferInfo, passedIndex, nextIndex, checkIn, MS, TOTAL};
+  window.SIM = {set:(v)=>{ t=v; $('simRange').value=v; upd(); }, setPos:(la,ln,acc,ts)=>handlePosition([la,ln],acc||10,ts||Date.now()), state, bufferInfo, lastTick, nextIndex, alongIndex, impliedPassed, nudgeFor, tick, untick, openCheckIn, doCheckIn, checkInText, trailText, render, MS, TOTAL, pointAt};
 }
 
 function tileInfo(){ $('tileInfo').textContent = 'Map tiles (' + layerNames[curLayer] + '): ' + tileStats.ok + ' loaded, ' + tileStats.err + ' failed' + (navigator.onLine ? '' : ' · offline'); }

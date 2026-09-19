@@ -1,0 +1,120 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Freyja&#x27;s Walk — turn by turn</title>
+<style>
+@page { size: A4 portrait; margin: 12mm 12mm 14mm; }
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#111;margin:0;background:#f3f4f6}
+.sheet{background:#fff;max-width:210mm;margin:0 auto;padding:12mm}
+@media print{ body{background:#fff} .sheet{max-width:none;padding:0} .noprint{display:none} }
+h1{font-size:22pt;margin:0 0 2mm}
+.sub{font-size:11pt;color:#374151;margin:0 0 5mm}
+table{width:100%;border-collapse:collapse;font-size:11pt}
+td{padding:2.2mm 2mm;border-bottom:1px solid #e5e7eb;vertical-align:top}
+tr{page-break-inside:avoid}
+td.n{width:9mm;color:#6b7280;font-variant-numeric:tabular-nums;text-align:right}
+td.a{width:9mm;font-size:16pt;line-height:1;text-align:center;color:#e8590c}
+td.d{width:17mm;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.t{width:17mm;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:#374151}
+td.k{width:15mm;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:#9ca3af;font-size:9.5pt}
+.pass{display:block;font-size:9.5pt;color:#6b7280;margin-top:1mm}
+tr.ms td{background:#fff7ed;border-top:2px solid #e8590c;border-bottom:2px solid #e8590c;font-weight:700}
+tr.ms td .brk{font-weight:400;color:#065f46}
+tr.ms td .ci{display:block;color:#1e3a8a;font-weight:700;margin-top:1mm}
+tr.ms td.a{color:#111;font-size:14pt}
+tr.ms .box{display:inline-block;width:5mm;height:5mm;border:1.5px solid #111;border-radius:1mm;vertical-align:middle;margin-right:2mm}
+.legend{font-size:9.5pt;color:#6b7280;margin-top:5mm;line-height:1.4}
+.noprint a{color:#0b6bcb}
+@media screen and (max-width: 640px){
+  .sheet{padding:12px 10px}
+  h1{font-size:20px}
+  .sub{font-size:13px}
+  table{font-size:15px}
+  td{padding:8px 4px}
+  td.k{display:none}
+  td.d,td.t{width:auto;font-size:13px}
+  td.n{width:22px}
+  td.a{width:26px;font-size:20px}
+  tr.ms .box{width:18px;height:18px}
+  .noprint{font-size:14px}
+}
+</style></head><body><div class="sheet">
+<div class="noprint" style="margin-bottom:4mm;font-size:11pt"><a href="index.html">← back to the app</a> · <a href="print.html">map sheets</a> · <a href="overview.html">whole route</a> · <button onclick="window.print()">Print</button></div>
+<script>
+// on the phone, shift the plan times to the start she pressed in the app (same localStorage key the app uses)
+(function(){ try {
+  var s = +localStorage.getItem('walk:freyja_walk:startAt'); if (!s) return;
+  var d = new Date(s), sh = d.getHours()*60 + d.getMinutes();
+  var shift = sh - 375; if (!shift) return;
+  document.querySelectorAll('td.t').forEach(function(td){
+    var m = td.textContent.match(/^(\d+):(\d+)(am|pm)$/); if (!m) return;
+    var h = +m[1] % 12 + (m[3] === 'pm' ? 12 : 0), t = (h*60 + +m[2] + shift + 1440) % 1440;
+    var hh = Math.floor(t/60), mm = t % 60, ap = hh >= 12 ? 'pm' : 'am'; hh = hh % 12 || 12;
+    td.textContent = hh + ':' + (mm < 10 ? '0' : '') + mm + ap;
+  });
+  var sub = document.querySelector('.sub'); if (sub) sub.textContent += ' · times shifted to your start at ' + (d.getHours() % 12 || 12) + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() + (d.getHours() >= 12 ? 'pm' : 'am');
+} catch(e){} })();
+</script>
+<h1>Freyja&#x27;s Walk — turn by turn</h1>
+<p class="sub">30.3 km · plan: leave 6:15am, Campsite at 4:58pm · be there by 6:00pm · times are the plan (the app shows the live buffer) · tick the boxes as you go</p>
+<table>
+<tr><td class="n">1</td><td class="a">⚑</td><td>Start at Home. Head south-east along Maida Vale Road</td><td class="d">160 m</td><td class="t">6:15am</td><td class="k">0 m</td></tr>
+<tr><td class="n">2</td><td class="a">↰</td><td>Turn left onto Evans Bay Parade</td><td class="d">1.0 km</td><td class="t">6:17am</td><td class="k">160 m</td></tr>
+<tr><td class="n">3</td><td class="a">↰</td><td>Bear left onto Oriental Parade</td><td class="d">1.7 km</td><td class="t">6:28am</td><td class="k">1.1 km</td></tr>
+<tr class="ms"><td class="n">1</td><td class="a">★</td><td><span class="box"></span>Te Waka Pou<span class="brk"> — first breakfast?<span class="ci">📱 test check-in — a practice one — make sure it sends</span></span></td><td class="d"></td><td class="t">6:47am</td><td class="k">2.8 km</td></tr>
+<tr><td class="n">4</td><td class="a">↱</td><td>Bear right and take the waterfront path (Herd St → Te Papa → Frank Kitts Park → Queens Wharf)</td><td class="d">1.7 km</td><td class="t">6:47am</td><td class="k">2.9 km</td></tr>
+<tr><td class="n">5</td><td class="a">↱</td><td>Bear right onto Waterloo Quay</td><td class="d">180 m</td><td class="t">7:11am</td><td class="k">4.5 km</td></tr>
+<tr><td class="n">6</td><td class="a">↰</td><td>Bear left onto Bunny Street</td><td class="d">60 m</td><td class="t">7:13am</td><td class="k">4.7 km</td></tr>
+<tr class="ms"><td class="n">2</td><td class="a">★</td><td><span class="box"></span>Gandhi statue (railway station)<span class="brk"> · 15 min break — first breakfast?</span></td><td class="d"></td><td class="t">7:14am</td><td class="k">4.8 km</td></tr>
+<tr><td class="n">7</td><td class="a">↑</td><td>Carry on along Bunny Street</td><td class="d">80 m</td><td class="t">7:29am</td><td class="k">4.8 km</td></tr>
+<tr><td class="n">8</td><td class="a">↱</td><td>Bear right onto Featherston Street</td><td class="d">80 m</td><td class="t">7:30am</td><td class="k">4.9 km</td></tr>
+<tr><td class="n">9</td><td class="a">↑</td><td>Continue along Thorndon Quay<span class="pass">pass Wellington Urban Motorway overhead</span></td><td class="d">1.4 km</td><td class="t">7:31am</td><td class="k">4.9 km</td></tr>
+<tr><td class="n">10</td><td class="a">↑</td><td>Continue along Hutt Road<span class="pass">pass Aotea Quay</span></td><td class="d">1.1 km</td><td class="t">7:51am</td><td class="k">6.4 km</td></tr>
+<tr class="ms"><td class="n">3</td><td class="a">★</td><td><span class="box"></span>1 Kaiwharawhara Rd<span class="brk"><span class="ci">📱 check in on WhatsApp</span></span></td><td class="d"></td><td class="t">8:07am</td><td class="k">7.5 km</td></tr>
+<tr><td class="n">11</td><td class="a">↱</td><td>Bear right onto Kaiwharawhara Road</td><td class="d">80 m</td><td class="t">8:07am</td><td class="k">7.5 km</td></tr>
+<tr><td class="n">12</td><td class="a">↱</td><td>Turn right onto Pickering Street</td><td class="d">80 m</td><td class="t">8:09am</td><td class="k">7.6 km</td></tr>
+<tr><td class="n">13</td><td class="a">↰</td><td>Turn left onto Fore Street<span class="pass">pass Cameron Street on your left</span></td><td class="d">180 m</td><td class="t">8:11am</td><td class="k">7.6 km</td></tr>
+<tr><td class="n">14</td><td class="a">↱</td><td>Bear right onto Winchester Street</td><td class="d">160 m</td><td class="t">8:15am</td><td class="k">7.8 km</td></tr>
+<tr class="ms"><td class="n">4</td><td class="a">★</td><td><span class="box"></span>Top of Winchester St<span class="brk"></span></td><td class="d"></td><td class="t">8:19am</td><td class="k">8.0 km</td></tr>
+<tr><td class="n">15</td><td class="a">↑</td><td>Continue along Kaiwharawhara Bridleway</td><td class="d">580 m</td><td class="t">8:19am</td><td class="k">8.0 km</td></tr>
+<tr><td class="n">16</td><td class="a">↱</td><td>Bear right onto Calcutta Street</td><td class="d">60 m</td><td class="t">8:45am</td><td class="k">8.6 km</td></tr>
+<tr class="ms"><td class="n">5</td><td class="a">★</td><td><span class="box"></span>Nicholson Road connect<span class="brk"> · 15 min break — second breakfast<span class="ci">📱 check in on WhatsApp</span></span><span class="pass">bridle track</span></td><td class="d"></td><td class="t">8:49am</td><td class="k">8.7 km</td></tr>
+<tr><td class="n">17</td><td class="a">↑</td><td>Continue onto Nicholson Road</td><td class="d">1.2 km</td><td class="t">9:04am</td><td class="k">8.6 km</td></tr>
+<tr><td class="n">18</td><td class="a">↱</td><td>Bear right onto Box Hill</td><td class="d">460 m</td><td class="t">9:22am</td><td class="k">9.9 km</td></tr>
+<tr class="ms"><td class="n">6</td><td class="a">★</td><td><span class="box"></span>Start of Burma Road<span class="brk"><span class="ci">📱 check in on WhatsApp</span></span></td><td class="d"></td><td class="t">9:30am</td><td class="k">10.4 km</td></tr>
+<tr><td class="n">19</td><td class="a">↑</td><td>Continue onto Burma Road<span class="pass">pass Jalna Avenue on your left; pass Kohima Drive on your left; pass Haumia Street on your right</span></td><td class="d">1.7 km</td><td class="t">9:30am</td><td class="k">10.3 km</td></tr>
+<tr><td class="n">20</td><td class="a">↑</td><td>Continue onto Moorefield Road</td><td class="d">1.0 km</td><td class="t">10:04am</td><td class="k">12.0 km</td></tr>
+<tr><td class="n">21</td><td class="a">↰</td><td>Bear left onto Bill Cutting Place</td><td class="d">80 m</td><td class="t">10:24am</td><td class="k">13.0 km</td></tr>
+<tr><td class="n">22</td><td class="a">↰</td><td>Turn left onto Johnsonville Road<span class="pass">pass Burgess Road on your right</span></td><td class="d">120 m</td><td class="t">10:26am</td><td class="k">13.1 km</td></tr>
+<tr><td class="n">23</td><td class="a">↱</td><td>Bear right onto Frank Johnson Street</td><td class="d">80 m</td><td class="t">10:28am</td><td class="k">13.2 km</td></tr>
+<tr><td class="n">24</td><td class="a">↰</td><td>Bear left onto Frank Johnson Street to Helston Road Walkway</td><td class="d">40 m</td><td class="t">10:30am</td><td class="k">13.3 km</td></tr>
+<tr class="ms"><td class="n">7</td><td class="a">★</td><td><span class="box"></span>Helston Road bridge<span class="brk"><span class="ci">📱 check in on WhatsApp</span></span></td><td class="d"></td><td class="t">10:31am</td><td class="k">13.4 km</td></tr>
+<tr><td class="n">25</td><td class="a">↰</td><td>Turn left onto Helston Road<span class="pass">pass Arthur Carman Street on your right</span></td><td class="d">300 m</td><td class="t">10:31am</td><td class="k">13.3 km</td></tr>
+<tr><td class="n">26</td><td class="a">↑</td><td>Continue onto Stewart Drive<span class="pass">pass Quigley Street on your right; pass Batchelor Street on your right</span></td><td class="d">1.2 km</td><td class="t">10:36am</td><td class="k">13.6 km</td></tr>
+<tr><td class="n">27</td><td class="a">↱</td><td>Bear right onto Bracken Road</td><td class="d">120 m</td><td class="t">10:56am</td><td class="k">14.8 km</td></tr>
+<tr><td class="n">28</td><td class="a">↰</td><td>Bear left onto Horokiwi Road West<span class="pass">pass Colchester Crescent on your left</span></td><td class="d">720 m</td><td class="t">10:58am</td><td class="k">14.9 km</td></tr>
+<tr><td class="n">29</td><td class="a">↰</td><td>Bear left onto Woodridge Drive<span class="pass">pass Kentwood Drive on your left</span></td><td class="d">480 m</td><td class="t">11:11am</td><td class="k">15.6 km</td></tr>
+<tr><td class="n">30</td><td class="a">↱</td><td>Bear right onto Cedarwood Street<span class="pass">pass Astelia Way on your left</span></td><td class="d">540 m</td><td class="t">11:19am</td><td class="k">16.1 km</td></tr>
+<tr class="ms"><td class="n">8</td><td class="a">★</td><td><span class="box"></span>Top of Cedarwood St<span class="brk"><span class="ci">📱 check in on WhatsApp</span></span></td><td class="d"></td><td class="t">11:28am</td><td class="k">16.6 km</td></tr>
+<tr><td class="n">31</td><td class="a">↑</td><td>Continue along the track from the top of Cedarwood Street down to Horokiwi Road</td><td class="d">1.2 km</td><td class="t">11:29am</td><td class="k">16.7 km</td></tr>
+<tr class="ms"><td class="n">9</td><td class="a">★</td><td><span class="box"></span>279 Horokiwi Rd<span class="brk"> · 15 min break — elevenses<span class="ci">📱 check in on WhatsApp</span></span><span class="pass">scary no access bit</span></td><td class="d"></td><td class="t">11:48am</td><td class="k">17.9 km</td></tr>
+<tr><td class="n">32</td><td class="a">↰</td><td>Turn left onto Horokiwi Road<span class="pass">pass Grenada Grinderton on your left; pass Woollaston Way on your left</span></td><td class="d">3.6 km</td><td class="t">12:03pm</td><td class="k">17.8 km</td></tr>
+<tr class="ms"><td class="n">10</td><td class="a">★</td><td><span class="box"></span>Horokiwi viewpoint<span class="brk"> · 10 min break — before plunging down hill — the off-road track starts here<span class="ci">📱 check in on WhatsApp</span></span><span class="pass">not good in the dark</span></td><td class="d"></td><td class="t">12:56pm</td><td class="k">21.4 km</td></tr>
+<tr><td class="n">33</td><td class="a">↱</td><td>Bear right onto Horokiwi Bridleway (the walking track from the viewpoint to the bridge)</td><td class="d">1.2 km</td><td class="t">1:06pm</td><td class="k">21.4 km</td></tr>
+<tr class="ms"><td class="n">11</td><td class="a">★</td><td><span class="box"></span>Bridge across the stream<span class="brk"> · 10 min break — boosted before climb</span><span class="pass">through the bush</span></td><td class="d"></td><td class="t">1:36pm</td><td class="k">22.6 km</td></tr>
+<tr><td class="n">34</td><td class="a">↰</td><td>Bear left and take the walking track up to Belmont Trig (Belmont Regional Park)</td><td class="d">1.4 km</td><td class="t">1:46pm</td><td class="k">22.6 km</td></tr>
+<tr><td class="n">35</td><td class="a">↱</td><td>Bear right onto Dress Circle tramping track — up to the trig and back down the same way</td><td class="d">260 m</td><td class="t">2:24pm</td><td class="k">23.9 km</td></tr>
+<tr class="ms"><td class="n">12</td><td class="a">★</td><td><span class="box"></span>Belmont Trig<span class="brk"> · 30 min break — lunch<span class="ci">☎ call Dad — call Dad from the top</span></span><span class="pass">bush bashing</span></td><td class="d"></td><td class="t">2:31pm</td><td class="k">24.2 km</td></tr>
+<tr><td class="n">36</td><td class="a">↑</td><td>Carry on along Dress Circle tramping track — up to the trig and back down the same way</td><td class="d">520 m</td><td class="t">3:01pm</td><td class="k">24.2 km</td></tr>
+<tr><td class="n">37</td><td class="a">↰</td><td>Bear left onto Belmont Trig tramping track, down to the carpark</td><td class="d">2.2 km</td><td class="t">3:10pm</td><td class="k">24.7 km</td></tr>
+<tr class="ms"><td class="n">13</td><td class="a">★</td><td><span class="box"></span>Belmont trig track carpark<span class="brk"><span class="ci">📱 check in on WhatsApp</span></span><span class="pass">still in the bush</span></td><td class="d"></td><td class="t">3:46pm</td><td class="k">26.9 km</td></tr>
+<tr><td class="n">38</td><td class="a">↱</td><td>Turn right onto Stratton Street</td><td class="d">1.8 km</td><td class="t">3:46pm</td><td class="k">26.9 km</td></tr>
+<tr class="ms"><td class="n">14</td><td class="a">★</td><td><span class="box"></span>4 Cottle Park Drive<span class="brk"> — turn left<span class="ci">📱 check in on WhatsApp</span></span><span class="pass">scary narrow street — needs to not be dark</span></td><td class="d"></td><td class="t">4:16pm</td><td class="k">28.7 km</td></tr>
+<tr><td class="n">39</td><td class="a">↰</td><td>Bear left onto Cottle Park Drive</td><td class="d">1.2 km</td><td class="t">4:16pm</td><td class="k">28.7 km</td></tr>
+<tr><td class="n">40</td><td class="a">↰</td><td>Turn left onto Normandale Road</td><td class="d">40 m</td><td class="t">4:38pm</td><td class="k">29.9 km</td></tr>
+<tr><td class="n">41</td><td class="a">↑</td><td>Continue along the farm driveway, 278 Normandale Rd</td><td class="d">280 m</td><td class="t">4:38pm</td><td class="k">29.9 km</td></tr>
+<tr class="ms"><td class="n">15</td><td class="a">★</td><td><span class="box"></span>278 Normandale Rd (the farm)<span class="brk"><span class="ci">📱 check in on WhatsApp</span></span><span class="pass">entrance to farm</span></td><td class="d"></td><td class="t">4:43pm</td><td class="k">30.1 km</td></tr>
+<tr><td class="n">42</td><td class="a">↑</td><td>Continue along the path up to the campsite</td><td class="d">130 m</td><td class="t">4:46pm</td><td class="k">30.2 km</td></tr>
+<tr class="ms"><td class="n">16</td><td class="a">★</td><td><span class="box"></span>Campsite<span class="brk"> — Camp here. School is just below.<span class="ci">☎ call Dad — once you are settled, call Dad</span></span><span class="pass">walk down from farm to school</span></td><td class="d"></td><td class="t">4:58pm</td><td class="k">30.3 km</td></tr>
+</table>
+<p class="legend">Columns: what to do · how far along that street or path · the plan's clock time at that point · kilometres from the start. ★ rows are the milestones on the sheet; the plan times there are Miles's numbers; 📱 means send a WhatsApp check-in from there (the app's Check in button does it), ☎ means ring Dad. Street names from OpenStreetMap; turns from the route line; "pass X on your left" is a check that you're on the right road, not a turn.</p>
+</div></body></html>
