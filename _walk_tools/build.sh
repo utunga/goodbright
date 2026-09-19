@@ -7,5 +7,6 @@ KEY="${LINZ_KEY:-1b095d00946a4967a289cff2eb6bfbd1}"
 for w in freyja_walk test_walk; do
   python3 build_route.py $w.json dist/$w
   python3 assemble.py $w.json dist/$w "$KEY"
+  if [ -f osm_runs_$w.txt ]; then python3 directions.py $w; fi
 done
 echo "now copy dist/freyja_walk and dist/test_walk over ../freyja_walk and ../test_walk"

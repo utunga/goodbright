@@ -168,7 +168,8 @@ function build(){
   // side table
   let rows = '';
   W.milestones.forEach((m, i) => {
-    rows += '<tr><td class="n">' + (m.finish ? '⛺' : i) + '</td><td>' + m.label + (m.legNote ? '<div class="sm">' + m.legNote + '</div>' : '') + (m.break ? '<div class="sm">' + m.break + ' min' + (m.note ? ' — ' + m.note : '') + '</div>' : (m.note ? '<div class="sm">' + m.note + '</div>' : '')) + '</td><td class="t">' + fmtOffset(m.offset) + '<div class="sm">' + fmtKm(m.along) + '</div></td></tr>';
+    const ci = m.checkin === 'call' ? '☎ call Dad' : m.checkin === 'test' ? '📱 test check-in' : m.checkin === 'send' ? '📱 check in' : '';
+    rows += '<tr><td class="n">' + (m.finish ? '⛺' : i) + '</td><td>' + m.label + (ci ? '<div class="sm"><b>' + ci + '</b></div>' : '') + (m.legNote ? '<div class="sm">' + m.legNote + '</div>' : '') + (m.break ? '<div class="sm">' + m.break + ' min' + (m.note ? ' — ' + m.note : '') + '</div>' : (m.note ? '<div class="sm">' + m.note + '</div>' : '')) + '</td><td class="t">' + fmtOffset(m.offset) + '<div class="sm">' + fmtKm(m.along) + '</div></td></tr>';
   });
   $('side').innerHTML = '<table>' + rows + '</table><div class="legend"><i class="sw" style="background:#e8590c"></i>route &nbsp; <i class="sw" style="background:#7c3aed"></i>joined by hand &nbsp; <i class="sw" style="background:#4b5563"></i>optional' + (W.pois.length ? ' &nbsp; <span class="poi" style="display:inline-flex;vertical-align:middle">' + (SVG[W.pois[0].kind]||'') + '</span> ' + (W.pois[0].kind === 'toilet' ? 'toilets' : 'points of interest') : '') + '<br>Times are planned arrivals, before any break.</div>';
   // map
@@ -273,7 +274,7 @@ async function savePng(){
       ctx.fillStyle = '#e8590c'; ctx.font = '800 ' + px(2.9) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.textAlign = 'right'; ctx.fillText(m.finish ? '⛺' : String(i), x0 + px(6), y); ctx.textAlign = 'left';
       ctx.fillStyle = '#111'; ctx.font = '400 ' + px(2.9) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText(m.label, x0 + px(8), y);
       ctx.textAlign = 'right'; ctx.fillText(fmtOffset(m.offset), x0 + colW - px(4), y); ctx.textAlign = 'left';
-      const sub = [m.legNote, m.break ? m.break + ' min' + (m.note ? ' — ' + m.note : '') : m.note].filter(Boolean).join(' · ');
+      const sub = [m.checkin === 'call' ? '☎ call Dad' : m.checkin ? '📱 check in' : '', m.legNote, m.break ? m.break + ' min' + (m.note ? ' — ' + m.note : '') : m.note].filter(Boolean).join(' · ');
       if (sub){ ctx.fillStyle = '#666'; ctx.font = '400 ' + px(2.3) + 'px -apple-system, Helvetica, Arial, sans-serif'; ctx.fillText(sub.slice(0, 60), x0 + px(8), y + px(2.8)); }
       y += rowH;
     });

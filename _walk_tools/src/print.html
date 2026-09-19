@@ -248,7 +248,8 @@ function build(){
   let rows = '';
   W.milestones.forEach((m, i) => {
     const sheets = cells.filter(c => c.items.includes(m)).map(c => c.n).join(', ');
-    rows += '<tr><td class="n">' + (m.finish ? '⛺' : i) + '</td><td>' + m.label + (m.legNote ? '<div class="sm">leg: ' + m.legNote + '</div>' : '') + '</td><td class="t">' + fmtOffset(m.offset) + '</td><td>' + (m.break ? m.break + ' min' + (m.note ? '<div class="sm">' + m.note + '</div>' : '') : (m.note ? '<div class="sm">' + m.note + '</div>' : '')) + '</td><td class="t">' + fmtKm(m.along) + '</td><td class="t">' + sheets + '</td></tr>';
+    const ci = m.checkin === 'call' ? '☎ call Dad' : m.checkin === 'test' ? '📱 test check-in' : m.checkin === 'send' ? '📱 check in' : '';
+    rows += '<tr><td class="n">' + (m.finish ? '⛺' : i) + '</td><td>' + m.label + (ci ? '<div class="sm"><b>' + ci + '</b>' + (m.checkinNote ? ' — ' + m.checkinNote : '') + '</div>' : '') + (m.legNote ? '<div class="sm">leg: ' + m.legNote + '</div>' : '') + '</td><td class="t">' + fmtOffset(m.offset) + '</td><td>' + (m.break ? m.break + ' min' + (m.note ? '<div class="sm">' + m.note + '</div>' : '') : (m.note ? '<div class="sm">' + m.note + '</div>' : '')) + '</td><td class="t">' + fmtKm(m.along) + '</td><td class="t">' + sheets + '</td></tr>';
   });
   cover.innerHTML = '<div class="cover"><div>' +
     '<h1>' + W.title + '</h1><div class="sub">' + W.subtitle + ' · ' + fmtKm(TOTAL) + ' · leave ' + fmtOffset(0) + ', due ' + fmtOffset(W.milestones[W.milestones.length-1].offset) + ' (' + W.bufferMin + ' min buffer' + (W.deadline ? ' — be there by ' + fmtClock(W.deadline) : ' → ' + fmtOffset(W.milestones[W.milestones.length-1].offset + W.bufferMin)) + ')</div>' +

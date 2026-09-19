@@ -21,7 +21,9 @@
       "kml": "Pou",
       "label": "Te Waka Pou",
       "offset": 32,
-      "note": "first breakfast?"
+      "note": "first breakfast?",
+      "checkin": "test",
+      "checkin_note": "a practice one — make sure it sends"
     },
     {
       "kml": "Mahatma Gandhi Statue",
@@ -33,7 +35,8 @@
     {
       "kml": "1 Kaiwharawhara Rd",
       "label": "1 Kaiwharawhara Rd",
-      "offset": 112
+      "offset": 112,
+      "checkin": "send"
     },
     {
       "kml": "Top of Winchester St",
@@ -46,22 +49,26 @@
       "offset": 154,
       "break": 15,
       "note": "second breakfast",
-      "leg_note": "bridle track"
+      "leg_note": "bridle track",
+      "checkin": "send"
     },
     {
       "kml": "Start of Burma Road",
       "label": "Start of Burma Road",
-      "offset": 195
+      "offset": 195,
+      "checkin": "send"
     },
     {
       "kml": "Helston Road Bridge",
       "label": "Helston Road bridge",
-      "offset": 256
+      "offset": 256,
+      "checkin": "send"
     },
     {
       "kml": "Top of Cedarwood street",
       "label": "Top of Cedarwood St",
-      "offset": 313
+      "offset": 313,
+      "checkin": "send"
     },
     {
       "kml": "279 Horokiwi Rd",
@@ -69,7 +76,8 @@
       "offset": 333,
       "break": 15,
       "note": "elevenses",
-      "leg_note": "scary no access bit"
+      "leg_note": "scary no access bit",
+      "checkin": "send"
     },
     {
       "label": "Horokiwi viewpoint",
@@ -80,7 +88,8 @@
       "coords": [
         174.8571324,
         -41.1873794
-      ]
+      ],
+      "checkin": "send"
     },
     {
       "kml": "\"bridge\" across stream",
@@ -96,26 +105,31 @@
       "offset": 496,
       "break": 30,
       "note": "lunch",
-      "leg_note": "bush bashing"
+      "leg_note": "bush bashing",
+      "checkin": "call",
+      "checkin_note": "call Dad from the top"
     },
     {
       "kml": "belmont trig track carpark",
       "label": "Belmont trig track carpark",
       "offset": 571,
-      "leg_note": "still in the bush"
+      "leg_note": "still in the bush",
+      "checkin": "send"
     },
     {
       "kml": "4 cottle park drive",
       "label": "4 Cottle Park Drive",
       "offset": 601,
       "note": "turn left",
-      "leg_note": "scary narrow street — needs to not be dark"
+      "leg_note": "scary narrow street — needs to not be dark",
+      "checkin": "send"
     },
     {
       "kml": "278 Normandale Rd (the farm)",
       "label": "278 Normandale Rd (the farm)",
       "offset": 628,
-      "leg_note": "entrance to farm"
+      "leg_note": "entrance to farm",
+      "checkin": "send"
     },
     {
       "label": "Campsite",
@@ -126,7 +140,9 @@
       "offset": 643,
       "note": "Camp here. School is just below.",
       "leg_note": "walk down from farm to school",
-      "finish": true
+      "finish": true,
+      "checkin": "call",
+      "checkin_note": "once you are settled, call Dad"
     }
   ],
   "landmarks": [

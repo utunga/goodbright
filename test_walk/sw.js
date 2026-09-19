@@ -5,7 +5,7 @@ const SHELL_FILES = ['./', 'index.html', 'data.js', 'print.html', 'overview.html
 const TILE_HOSTS = ['tiles-a.data-cdn.linz.govt.nz', 'tiles-b.data-cdn.linz.govt.nz', 'tiles-c.data-cdn.linz.govt.nz', 'tiles-d.data-cdn.linz.govt.nz', 'basemaps.linz.govt.nz', 'server.arcgisonline.com', 'tile.openstreetmap.org', 'tile.opentopomap.org', 'a.tile.opentopomap.org', 'b.tile.opentopomap.org', 'c.tile.opentopomap.org'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).catch(() => {}));
+  e.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES).then(() => c.add('directions.html').catch(() => {}))).catch(() => {}));
   self.skipWaiting();
 });
 self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
