@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#F4F6F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1412" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Kitty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@1,9..144,600&display=swap">
+<style>
+  :root {
+    --bg: #F4F6F3;
+    --surface: #FFFFFF;
+    --ink: #18201C;
+    --muted: #66706A;
+    --faint: #A9B1AB;
+    --line: #E1E6E2;
+    --accent: #1F7A63;
+    --accent-soft: #E3F1EC;
+    --accent-ink: #FFFFFF;
+    --danger: #C6453C;
+    --danger-ink: #FFFFFF;
+    --shadow: 0 8px 28px rgba(20, 40, 30, .18);
+    --font: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --radius: 12px;
+    --row-h: 52px;
+    --tap: 44px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1412;
+      --surface: #182019;
+      --ink: #E6ECE8;
+      --muted: #8C968F;
+      --faint: #5C665F;
+      --line: #263029;
+      --accent: #4FC3A1;
+      --accent-soft: #1B3A31;
+      --accent-ink: #0B1510;
+      --danger: #E06A5F;
+      --danger-ink: #1A0E0D;
+      --shadow: 0 8px 28px rgba(0, 0, 0, .5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1412;
+    --surface: #182019;
+    --ink: #E6ECE8;
+    --muted: #8C968F;
+    --faint: #5C665F;
+    --line: #263029;
+    --accent: #4FC3A1;
+    --accent-soft: #1B3A31;
+    --accent-ink: #0B1510;
+    --danger: #E06A5F;
+    --danger-ink: #1A0E0D;
+    --shadow: 0 8px 28px rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.35;
+    -webkit-text-size-adjust: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { background: none; border: 0; padding: 0; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- shell ---------- */
+  #app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--bg);
+  }
+
+  header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+  #tabs {
+    flex: 1 1 auto;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0 8px;
+    gap: 2px;
+  }
+  #tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 50px;
+    padding: 4px 10px 0;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: color .15s;
+  }
+  .tab .n {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    min-width: 1ch;
+  }
+  .tab.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab.active .n { color: var(--accent); }
+  .tab.add { color: var(--faint); font-size: 20px; font-weight: 400; padding: 0 12px; }
+  #menuBtn {
+    flex: 0 0 var(--tap);
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 22px;
+    letter-spacing: 1px;
+    border-left: 1px solid var(--line);
+  }
+
+  /* ---------- composer ---------- */
+  #composer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--bg);
+  }
+  #composer .box {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding-left: 12px;
+    min-height: 48px;
+    transition: border-color .15s;
+  }
+  #composer .box:focus-within { border-color: var(--accent); }
+  #composer .plus {
+    color: var(--accent);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1;
+    width: 24px;
+    text-align: center;
+    flex: 0 0 auto;
+  }
+  #newItem {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 12px 10px;
+    font-size: 17px;
+    outline: none;
+  }
+  #newItem::placeholder { color: var(--faint); }
+  #addBtn {
+    flex: 0 0 auto;
+    padding: 0 14px;
+    align-self: stretch;
+    color: var(--accent);
+    font-weight: 700;
+    border-left: 1px solid var(--line);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  /* ---------- panel deck ---------- */
+  #deck {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  #deck::-webkit-scrollbar { display: none; }
+  .panel {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    padding: 0 16px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+  .list { display: flex; flex-direction: column; }
+  .empty {
+    color: var(--faint);
+    text-align: center;
+    padding: 40px 16px 12px;
+    font-size: 15px;
+  }
+
+  /* ---------- rows ---------- */
+  .row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--row-h);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .row.placeholder { opacity: .25; }
+  .row.pulse { animation: pulse .7s ease-out; }
+  @keyframes pulse { 0% { background: var(--accent-soft); } 100% { background: var(--bg); } }
+  .row.checking { transition: opacity .3s ease .1s; opacity: .45; }
+  .row.ghost {
+    position: fixed;
+    left: 0; right: 0;
+    z-index: 30;
+    pointer-events: none;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    border-radius: 10px;
+    padding: 6px 12px;
+    border-bottom: 0;
+    opacity: .96;
+  }
+  .row.leaving {
+    transition: transform .18s ease-in, opacity .18s ease-in, max-height .22s ease-in .05s, padding .22s ease-in .05s;
+    opacity: 0;
+    max-height: 0 !important;
+    padding-top: 0; padding-bottom: 0;
+    overflow: hidden;
+    border-bottom-width: 0;
+  }
+  .row.entering { animation: rowIn .28s cubic-bezier(.2,.8,.3,1); }
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .check {
+    flex: 0 0 var(--tap);
+    height: var(--tap);
+    display: grid;
+    place-items: center;
+    margin-left: -10px;
+  }
+  .check .ring {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--faint);
+    display: grid;
+    place-items: center;
+    transition: background .18s, border-color .18s, transform .18s;
+  }
+  .check .ring svg { width: 15px; height: 15px; opacity: 0; transform: scale(.4); transition: opacity .15s, transform .2s cubic-bezier(.2,1.4,.4,1); }
+  .check[aria-checked="true"] .ring { background: var(--accent); border-color: var(--accent); }
+  .check[aria-checked="true"] .ring svg { opacity: 1; transform: scale(1); }
+  .check:active .ring { transform: scale(.9); }
+
+  .txt {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    padding: 4px 0;
+    text-align: left;
+    line-height: 1.3;
+  }
+  .row.done .txt { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--faint); }
+  .age {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    min-width: 2.2ch;
+    text-align: right;
+  }
+  .age.old { color: var(--muted); }
+  .handle {
+    flex: 0 0 var(--tap);
+    height: var(--tap);
+    display: grid;
+    place-items: center;
+    color: var(--faint);
+    touch-action: none;
+    margin-right: -12px;
+    cursor: grab;
+  }
+  .handle svg { width: 18px; height: 18px; }
+
+  /* remove button on done rows */
+  .remove {
+    flex: 0 0 var(--tap);
+    height: var(--tap);
+    display: grid;
+    place-items: center;
+    color: var(--faint);
+    margin-right: -12px;
+    border-radius: 50%;
+    transition: color .15s, background .15s;
+  }
+  .remove svg { width: 18px; height: 18px; }
+  .remove:active { color: var(--danger); background: var(--accent-soft); }
+
+  /* ---------- done section ---------- */
+  .done-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--tap);
+    margin-top: 18px;
+    padding: 4px 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-align: left;
+  }
+  .done-head .chev { transition: transform .2s; display: inline-grid; place-items: center; width: 14px; height: 14px; }
+  .done-head .chev svg { width: 12px; height: 12px; }
+  .done-head[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+  .done-head .n { font-weight: 400; letter-spacing: 0; color: var(--faint); }
+  .done-head .rule { flex: 1 1 auto; height: 1px; background: var(--line); }
+  .clear-done {
+    display: block;
+    margin: 14px auto 0;
+    padding: 10px 14px;
+    color: var(--muted);
+    font-size: 14px;
+    text-decoration: underline;
+    text-decoration-color: var(--faint);
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- dialogs & sheets ---------- */
+  dialog {
+    border: 0;
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 20px;
+    width: min(92vw, 420px);
+    box-shadow: var(--shadow);
+  }
+  dialog::backdrop { background: rgba(10, 16, 13, .45); }
+  dialog h2 { margin: 0 0 8px; font-size: 18px; text-wrap: balance; }
+  dialog p { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+  dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  dialog .actions .spacer { flex: 1 1 auto; }
+  .btn {
+    min-height: var(--tap);
+    padding: 0 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.danger { background: var(--danger); border-color: var(--danger); color: var(--danger-ink); }
+  .btn.quiet { border-color: transparent; background: transparent; color: var(--muted); }
+  .btn.small { min-height: 36px; padding: 0 12px; font-size: 14px; }
+  .field {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    padding: 12px;
+    font-size: 17px;
+  }
+  textarea.field { min-height: 88px; resize: vertical; line-height: 1.35; }
+  select.field { appearance: auto; }
+  label.lbl { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .radios { display: flex; flex-direction: column; gap: 4px; }
+  .radios label { display: flex; align-items: center; gap: 10px; min-height: var(--tap); padding: 0 6px; border-radius: 8px; }
+  .radios input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+  dialog.sheet {
+    position: fixed;
+    inset: auto 0 0 0;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 720px;
+    border-radius: 18px 18px 0 0;
+    padding: 8px 8px calc(12px + env(safe-area-inset-bottom, 0px));
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  dialog.sheet .grip { width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: 4px auto 10px; }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 50px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    text-align: left;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .menu-item:active { background: var(--bg); }
+  .menu-item .ic { width: 24px; text-align: center; color: var(--muted); font-size: 18px; flex: 0 0 auto; }
+  .menu-item.danger { color: var(--danger); }
+  .menu-item.danger .ic { color: var(--danger); }
+  .menu-item small { display: block; color: var(--muted); font-size: 13px; }
+  .menu-sep { height: 1px; background: var(--line); margin: 6px 12px; }
+  .menu-foot { color: var(--faint); font-size: 12px; padding: 10px 12px 4px; }
+
+  /* ---------- toast ---------- */
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 12px);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 10px 10px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s, transform .18s;
+    z-index: 40;
+    max-width: calc(100vw - 32px);
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  #toast button { color: var(--accent); font-weight: 700; padding: 6px 8px; min-height: 32px; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #toast button { color: #8FE3C8; } }
+  :root[data-theme="dark"] #toast button { color: #8FE3C8; }
+
+  /* ---------- celebration ---------- */
+  #fx {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+  }
+  #fxMsg {
+    position: fixed;
+    inset: 0;
+    z-index: 51;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    padding: 24px;
+    text-align: center;
+  }
+  #fxMsg .m {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(34px, 9vw, 64px);
+    line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 0 2px 24px var(--bg), 0 0 2px var(--bg);
+    text-wrap: balance;
+    opacity: 0;
+    transform: translateY(10px) scale(.96);
+    max-width: 10ch;
+  }
+  #fxMsg .m.in { animation: msgIn 1.9s cubic-bezier(.2,.9,.3,1) forwards; }
+  #fxMsg .m.big { font-size: clamp(44px, 13vw, 92px); }
+  @keyframes msgIn {
+    0%   { opacity: 0; transform: translateY(14px) scale(.94); }
+    12%  { opacity: 1; transform: translateY(0) scale(1); }
+    75%  { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-10px) scale(1.02); }
+  }
+  #flash {
+    position: fixed; inset: 0; z-index: 49; pointer-events: none;
+    background: var(--accent); opacity: 0;
+  }
+  #flash.go { animation: flash .6s ease-out; }
+  @keyframes flash { 0% { opacity: .35; } 100% { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    #fxMsg .m.in { animation: msgInStill 1.6s linear forwards; }
+    @keyframes msgInStill { 0%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+  }
+</style>
+
+</head>
+<body>
+<div id="app">
+  <header>
+    <nav id="tabs" aria-label="Lists"></nav>
+    <button id="menuBtn" aria-label="Menu" title="Menu">⋯</button>
+  </header>
+
+  <form id="composer" autocomplete="off">
+    <div class="box">
+      <span class="plus" aria-hidden="true">+</span>
+      <input id="newItem" type="text" enterkeyhint="done" autocapitalize="sentences" autocomplete="off" placeholder="Add…" aria-label="New item">
+      <button id="addBtn" type="submit" hidden>Add</button>
+    </div>
+  </form>
+
+  <main id="deck"></main>
+</div>
+
+<div id="flash"></div>
+<canvas id="fx"></canvas>
+<div id="fxMsg" aria-live="polite"><div class="m" id="fxText"></div></div>
+<div id="toast" role="status"><span id="toastText"></span><button id="toastBtn" type="button">Undo</button></div>
+
+<!-- generic confirm -->
+<dialog id="dlgConfirm">
+  <h2 id="confirmTitle"></h2>
+  <p id="confirmBody"></p>
+  <div class="actions">
+    <button class="btn quiet" type="button" data-act="cancel">Cancel</button>
+    <button class="btn primary" type="button" data-act="ok" id="confirmOk">OK</button>
+  </div>
+</dialog>
+
+<!-- generic prompt -->
+<dialog id="dlgPrompt">
+  <form method="dialog">
+    <h2 id="promptTitle"></h2>
+    <input class="field" id="promptInput" type="text" autocapitalize="words" enterkeyhint="done" maxlength="40">
+    <div class="actions">
+      <button class="btn quiet" type="button" data-act="cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="promptOk">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- edit item -->
+<dialog id="dlgEdit">
+  <form method="dialog">
+    <h2>Edit</h2>
+    <textarea class="field" id="editText" rows="3" enterkeyhint="done"></textarea>
+    <label class="lbl" for="editCat">List</label>
+    <select class="field" id="editCat"></select>
+    <div class="actions">
+      <button class="btn quiet" type="button" id="editDelete" style="color: var(--danger)">Delete</button>
+      <span class="spacer"></span>
+      <button class="btn quiet" type="button" data-act="cancel">Cancel</button>
+      <button class="btn primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- delete category with open items -->
+<dialog id="dlgMove">
+  <form method="dialog">
+    <h2 id="moveTitle"></h2>
+    <p id="moveBody"></p>
+    <div class="radios" id="moveRadios"></div>
+    <div class="actions">
+      <button class="btn quiet" type="button" data-act="cancel">Cancel</button>
+      <button class="btn danger" type="submit">Move &amp; delete</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- restore -->
+<dialog id="dlgRestore">
+  <form method="dialog">
+    <h2>Restore a backup</h2>
+    <p>Pick the backup file, or paste the JSON from a backup email. This replaces everything here (you can undo once).</p>
+    <input class="field" id="restoreFile" type="file" accept=".json,application/json,text/plain">
+    <label class="lbl" for="restoreText">Or paste</label>
+    <textarea class="field" id="restoreText" rows="4" placeholder='{"v":1, ...}' spellcheck="false" autocapitalize="off"></textarea>
+    <div class="actions">
+      <button class="btn quiet" type="button" data-act="cancel">Cancel</button>
+      <button class="btn primary" type="submit">Restore</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- menu sheet -->
+<dialog id="dlgMenu" class="sheet" aria-label="Menu">
+  <div class="grip"></div>
+  <button class="menu-item" type="button" data-menu="newCat"><span class="ic">+</span>New list</button>
+  <button class="menu-item" type="button" data-menu="renameCat"><span class="ic">✎</span><span>Rename <b id="menuCatName"></b></span></button>
+  <button class="menu-item danger" type="button" data-menu="deleteCat"><span class="ic">×</span><span>Delete <b id="menuCatName2"></b></span></button>
+  <div class="menu-sep"></div>
+  <a class="menu-item" id="emailBackup" href="#"><span class="ic">✉</span><span>Email backup<small>to utunga@gmail.com</small></span></a>
+  <button class="menu-item" type="button" data-menu="saveBackup" id="saveBackupItem"><span class="ic">⤓</span>Save backup file</button>
+  <button class="menu-item" type="button" data-menu="restore"><span class="ic">⤒</span>Restore from backup</button>
+  <div class="menu-sep"></div>
+  <div class="menu-foot" id="menuFoot"></div>
+</dialog>
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   Kitty — lists for a phone.
+   Data lives in localStorage under KEY as one JSON document:
+     { v, cats:[{id,name}], items:[{id,cat,text,created,done}], active, ui }
+   items[] order is the manual order of OPEN items within a list.
+   Done items sort by completion time. Bump SCHEMA and add a MIGRATIONS[n]
+   step whenever the shape changes; load() and restore() both run them.
+   ===================================================================== */
+
+const SCHEMA = 1;
+const KEY = 'kitty.data';
+const LEGACY_KEY = 'kete.data'; // name before the rename; read as a fallback
+const BACKUP_TO = 'utunga@gmail.com';
+
+// ---------- utils ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const now = () => Date.now();
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function vibrate(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (_) {} }
+
+// ---------- schema & migrations ----------
+const MIGRATIONS = {
+  // Example for the next change:
+  // 2: d => { for (const i of d.items) i.note = i.note ?? ''; return d; },
+};
+function migrate(raw) {
+  if (!raw || typeof raw !== 'object') throw new Error('Not a Kitty backup.');
+  let d = raw;
+  let v = Number(d.v) || 0;
+  if (v > SCHEMA) throw new Error(`That backup is from a newer version (v${v}); this app is v${SCHEMA}.`);
+  while (v < SCHEMA) {
+    v++;
+    const step = MIGRATIONS[v];
+    if (step) d = step(d) || d;
+    d.v = v;
+  }
+  return normalize(d);
+}
+// Coerce anything roughly shaped like our data into exactly our data.
+function normalize(d) {
+  const out = { v: SCHEMA, cats: [], items: [], active: null, ui: { collapsed: {}, doneCount: 0 } };
+  if (Array.isArray(d.cats)) for (const c of d.cats) {
+    if (!c || typeof c.name !== 'string') continue;
+    const name = c.name.trim().slice(0, 40);
+    if (name) out.cats.push({ id: String(c.id || uid()), name });
+  }
+  if (!out.cats.length) out.cats.push({ id: uid(), name: 'Personal' });
+  const catIds = new Set(out.cats.map(c => c.id));
+  if (Array.isArray(d.items)) for (const i of d.items) {
+    if (!i || typeof i.text !== 'string') continue;
+    const text = i.text.trim();
+    if (!text) continue;
+    out.items.push({
+      id: String(i.id || uid()),
+      cat: catIds.has(String(i.cat)) ? String(i.cat) : out.cats[0].id,
+      text,
+      created: Number(i.created) || now(),
+      done: i.done ? (Number(i.done) || now()) : null,
+    });
+  }
+  out.active = catIds.has(d.active) ? d.active : out.cats[0].id;
+  const ui = d.ui && typeof d.ui === 'object' ? d.ui : {};
+  if (ui.collapsed && typeof ui.collapsed === 'object')
+    for (const k of Object.keys(ui.collapsed)) if (catIds.has(k)) out.ui.collapsed[k] = !!ui.collapsed[k];
+  out.ui.doneCount = Number(ui.doneCount) || 0;
+  return out;
+}
+function seed() {
+  const t = now();
+  const shop = { id: uid(), name: 'Shopping' }, pers = { id: uid(), name: 'Personal' }, work = { id: uid(), name: 'Work' };
+  return normalize({
+    v: SCHEMA, cats: [shop, pers, work], active: pers.id,
+    items: [
+      { id: uid(), cat: pers.id, text: 'Tap the circle to tick this off', created: t },
+      { id: uid(), cat: pers.id, text: 'Swipe the list left or right to change lists', created: t - 1 },
+      { id: uid(), cat: pers.id, text: 'Drag the ≡ handle to reorder', created: t - 2 },
+      { id: uid(), cat: pers.id, text: 'Tap an item to edit it, or move it to another list', created: t - 3 },
+      { id: uid(), cat: pers.id, text: 'Done items: tap ✕ to remove one, or clear them all at the bottom', created: t - 4 },
+    ],
+  });
+}
+
+// ---------- storage ----------
+let state;
+let storageOk = true;
+let persisted = null;
+function load() {
+  let raw = null;
+  try { raw = localStorage.getItem(KEY) || localStorage.getItem(LEGACY_KEY); } catch (_) { storageOk = false; }
+  if (!raw) return seed();
+  try {
+    const parsed = JSON.parse(raw);
+    if ((Number(parsed.v) || 0) < SCHEMA) { try { localStorage.setItem(`${KEY}.pre-v${SCHEMA}`, raw); } catch (_) {} }
+    return migrate(parsed);
+  } catch (e) {
+    console.error('Saved data unreadable; starting fresh. Copy kept.', e);
+    try { localStorage.setItem(`${KEY}.unreadable-${now()}`, raw); } catch (_) {}
+    return seed();
+  }
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); storageOk = true; }
+  catch (e) { storageOk = false; console.error(e); }
+}
+function requestPersistence() {
+  try {
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().then(ok => { persisted = ok; });
+  } catch (_) {}
+}
+try { if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then(ok => { persisted = ok; }); } catch (_) {}
+
+// ---------- derived ----------
+const cat = id => state.cats.find(c => c.id === id);
+const catIndex = id => state.cats.findIndex(c => c.id === id);
+const openItems = cid => state.items.filter(i => i.cat === cid && !i.done);
+const doneItems = cid => state.items.filter(i => i.cat === cid && i.done).sort((a, b) => b.done - a.done);
+const item = id => state.items.find(i => i.id === id);
+function moveToTop(it) {
+  const k = state.items.indexOf(it);
+  if (k > -1) state.items.splice(k, 1);
+  state.items.unshift(it);
+}
+
+// ---------- time ----------
+function ageShort(ms) {
+  const h = ms / 36e5;
+  if (h < 1) return '';
+  if (h < 24) return Math.floor(h) + 'h';
+  const d = h / 24;
+  if (d < 7) return Math.floor(d) + 'd';
+  const w = d / 7;
+  if (w < 5) return Math.floor(w) + 'w';
+  const mo = d / 30.4;
+  if (mo < 12) return Math.floor(mo) + 'mo';
+  return Math.floor(d / 365) + 'y';
+}
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const num = n => n <= 20 ? WORDS[n] : String(n);
+function ageLong(ms) {
+  const h = ms / 36e5;
+  const f = (n, w) => `${num(n)} ${w}${n === 1 ? '' : 's'}`;
+  if (h < 1) return f(Math.max(1, Math.floor(ms / 6e4)), 'minute');
+  if (h < 24) return f(Math.floor(h), 'hour');
+  const d = h / 24;
+  if (d < 14) return f(Math.floor(d), 'day');
+  const w = d / 7;
+  if (w < 9) return f(Math.floor(w), 'week');
+  const mo = d / 30.4;
+  if (mo < 12) return f(Math.floor(mo), 'month');
+  return f(Math.floor(d / 365), 'year');
+}
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+// ---------- DOM ----------
+const tabsEl = $('#tabs'), deck = $('#deck'), composer = $('#composer'), input = $('#newItem'), addBtn = $('#addBtn');
+const toastEl = $('#toast'), toastText = $('#toastText'), toastBtn = $('#toastBtn');
+
+const CHECK_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const HANDLE_SVG = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const X_SVG = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+function rowHTML(it, enterId) {
+  const age = it.done ? '' : ageShort(now() - it.created);
+  const old = !it.done && (now() - it.created) > 3 * 864e5;
+  const inner =
+    `<button class="check" role="checkbox" aria-checked="${it.done ? 'true' : 'false'}" aria-label="${it.done ? 'Not done' : 'Done'}" data-act="toggle"><span class="ring">${CHECK_SVG}</span></button>` +
+    `<button class="txt" type="button" data-act="edit">${esc(it.text)}</button>` +
+    (it.done
+      ? `<button class="remove" type="button" data-act="remove" aria-label="Remove" title="Remove">${X_SVG}</button>`
+      : `<span class="age${old ? ' old' : ''}" title="Added ${new Date(it.created).toLocaleDateString()}">${age}</span>` +
+        `<span class="handle" aria-label="Drag to reorder" title="Drag to reorder">${HANDLE_SVG}</span>`);
+  return `<div class="row${it.done ? ' done' : ''}${it.id === enterId ? ' entering' : ''}" data-id="${it.id}">${inner}</div>`;
+}
+
+function renderPanel(p, c, enterId) {
+  const open = openItems(c.id), done = doneItems(c.id);
+  const collapsed = !!state.ui.collapsed[c.id];
+  let html = `<div class="list open" data-cat="${c.id}">${open.map(i => rowHTML(i, enterId)).join('')}</div>`;
+  if (!open.length) html += `<div class="empty">${done.length ? 'All done here.' : 'Nothing here yet. Add something above.'}</div>`;
+  if (done.length) {
+    html += `<button class="done-head" type="button" data-act="collapse" aria-expanded="${!collapsed}"><span class="chev"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Done <span class="n">${done.length}</span><span class="rule"></span></button>`;
+    if (!collapsed) {
+      html += `<div class="list donelist" data-cat="${c.id}">${done.map(i => rowHTML(i)).join('')}</div>`;
+      html += `<button class="clear-done" type="button" data-act="clearDone">Clear ${done.length === 1 ? 'the done item' : `all ${done.length} done items`}</button>`;
+    }
+  }
+  p.innerHTML = html;
+}
+
+let deckSig = '';
+function renderDeck(enterId) {
+  const existing = new Map([...deck.children].map(p => [p.dataset.cat, p]));
+  const keep = new Set();
+  state.cats.forEach((c, i) => {
+    let p = existing.get(c.id);
+    if (!p) {
+      p = document.createElement('section');
+      p.className = 'panel';
+      p.dataset.cat = c.id;
+    }
+    p.setAttribute('aria-label', c.name);
+    keep.add(c.id);
+    if (deck.children[i] !== p) deck.insertBefore(p, deck.children[i] || null);
+    renderPanel(p, c, enterId);
+  });
+  for (const [id, p] of existing) if (!keep.has(id)) p.remove();
+  const sig = state.cats.map(c => c.id).join('|');
+  if (sig !== deckSig) { deckSig = sig; go(catIndex(state.active), false); }
+}
+
+function renderTabs() {
+  tabsEl.innerHTML = state.cats.map(c => {
+    const n = openItems(c.id).length;
+    const active = c.id === state.active;
+    return `<button class="tab${active ? ' active' : ''}" type="button" role="tab" aria-selected="${active}" data-cat="${c.id}">${esc(c.name)}<span class="n">${n || ''}</span></button>`;
+  }).join('') + '<button class="tab add" type="button" data-act="newCat" aria-label="New list" title="New list">+</button>';
+  const a = $('.tab.active', tabsEl);
+  if (a) a.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+}
+
+function updateComposer() {
+  const c = cat(state.active);
+  input.placeholder = c ? `Add to ${c.name}…` : 'Add…';
+}
+
+function render(enterId) {
+  renderTabs();
+  renderDeck(enterId);
+  updateComposer();
+}
+
+// ---------- deck (category swiping) ----------
+function go(i, smooth = true) {
+  i = clamp(i, 0, state.cats.length - 1);
+  const w = deck.clientWidth || 1;
+  if (smooth && !reducedMotion) deck.scrollTo({ left: i * w, behavior: 'smooth' });
+  else deck.scrollLeft = i * w;
+}
+function setActive(id) {
+  if (state.active === id) return;
+  state.active = id;
+  save();
+  renderTabs();
+  updateComposer();
+}
+function onDeckSettle() {
+  const i = clamp(Math.round(deck.scrollLeft / (deck.clientWidth || 1)), 0, state.cats.length - 1);
+  const c = state.cats[i];
+  if (c) setActive(c.id);
+}
+let settleTimer = 0;
+deck.addEventListener('scroll', () => { clearTimeout(settleTimer); settleTimer = setTimeout(onDeckSettle, 140); }, { passive: true });
+deck.addEventListener('scrollend', onDeckSettle);
+addEventListener('resize', () => { go(catIndex(state.active), false); fxResize(); });
+
+tabsEl.addEventListener('click', e => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.act === 'newCat') return newCategory();
+  const id = t.dataset.cat;
+  if (!id) return;
+  setActive(id);
+  go(catIndex(id));
+});
+
+// ---------- items ----------
+function addText(raw) {
+  const lines = String(raw).split(/\n+/).map(s => s.trim().replace(/\s+/g, ' ')).filter(Boolean);
+  if (!lines.length) return;
+  let lastId = null;
+  for (const text of lines.reverse()) lastId = addOne(text) || lastId;
+  save();
+  render(lastId);
+  const p = deck.children[catIndex(state.active)];
+  if (p) p.scrollTop = 0;
+}
+function addOne(text) {
+  const cid = state.active, lower = text.toLowerCase();
+  const dupOpen = state.items.find(i => i.cat === cid && !i.done && i.text.toLowerCase() === lower);
+  if (dupOpen) { setTimeout(() => flashRow(dupOpen.id), 0); return null; }
+  const dupDone = state.items.find(i => i.cat === cid && i.done && i.text.toLowerCase() === lower);
+  if (dupDone) { dupDone.done = null; dupDone.created = now(); moveToTop(dupDone); return dupDone.id; }
+  const it = { id: uid(), cat: cid, text, created: now(), done: null };
+  state.items.unshift(it);
+  return it.id;
+}
+function flashRow(id) {
+  const r = deck.querySelector(`.row[data-id="${id}"]`);
+  if (!r) return;
+  r.classList.remove('pulse'); void r.offsetWidth; r.classList.add('pulse');
+  r.scrollIntoView({ block: 'nearest' });
+}
+function toggleItem(id, checkEl) {
+  const it = item(id);
+  if (!it) return;
+  if (it.done) {
+    it.done = null;
+    it.created = now();
+    moveToTop(it);
+    save();
+    render(it.id);
+    vibrate(8);
+    return;
+  }
+  it.done = now();
+  state.ui.doneCount = (state.ui.doneCount || 0) + 1;
+  save();
+  checkEl.setAttribute('aria-checked', 'true');
+  const row = checkEl.closest('.row');
+  row.classList.add('checking');
+  celebrate(it, checkEl);
+  setTimeout(() => render(), 420);
+}
+function removeItem(id, label = 'Removed') {
+  const k = state.items.findIndex(i => i.id === id);
+  if (k < 0) return;
+  pushUndo(label);
+  state.items.splice(k, 1);
+  save();
+  render();
+}
+function clearDone(cid) {
+  const done = doneItems(cid);
+  if (!done.length) return;
+  confirmDlg(`Clear ${plural(done.length, 'done item')}?`, `They’ll be removed from ${cat(cid).name}. You can undo once.`, 'Clear', true).then(ok => {
+    if (!ok) return;
+    pushUndo(`Cleared ${plural(done.length, 'done item')}`);
+    state.items = state.items.filter(i => !(i.cat === cid && i.done));
+    save();
+    render();
+  });
+}
+function commitOrder(cid, ids) {
+  const open = new Map(openItems(cid).map(i => [i.id, i]));
+  if (ids.length !== open.size) return;
+  const ordered = ids.map(id => open.get(id)).filter(Boolean);
+  if (ordered.length !== open.size) return;
+  state.items = [...ordered, ...state.items.filter(i => !(i.cat === cid && !i.done))];
+  save();
+  renderTabs();
+}
+
+composer.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = input.value;
+  input.value = '';
+  addBtn.hidden = true;
+  addText(v);
+  input.focus();
+});
+input.addEventListener('input', () => { addBtn.hidden = !input.value.trim(); });
+addBtn.addEventListener('pointerdown', e => e.preventDefault()); // keep the keyboard up
+
+// row clicks (delegated)
+let suppressClick = false;
+deck.addEventListener('click', e => {
+  if (suppressClick) { e.preventDefault(); e.stopPropagation(); return; }
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const row = b.closest('.row');
+  const panel = b.closest('.panel');
+  switch (b.dataset.act) {
+    case 'toggle': return toggleItem(row.dataset.id, b);
+    case 'edit': return openEdit(row.dataset.id);
+    case 'remove': {
+      const id = row.dataset.id;
+      row.style.maxHeight = row.offsetHeight + 'px';
+      requestAnimationFrame(() => row.classList.add('leaving'));
+      vibrate(10);
+      setTimeout(() => removeItem(id), 220);
+      return;
+    }
+    case 'collapse': {
+      const cid = panel.dataset.cat;
+      state.ui.collapsed[cid] = !state.ui.collapsed[cid];
+      save();
+      renderPanel(panel, cat(cid));
+      return;
+    }
+    case 'clearDone': return clearDone(panel.dataset.cat);
+  }
+});
+
+// ---------- dialogs ----------
+const dlgConfirm = $('#dlgConfirm'), dlgPrompt = $('#dlgPrompt'), dlgEdit = $('#dlgEdit'), dlgMove = $('#dlgMove'), dlgRestore = $('#dlgRestore'), dlgMenu = $('#dlgMenu');
+for (const d of $$('dialog')) {
+  d.addEventListener('click', e => { if (e.target === d) d.close('cancel'); });
+  d.addEventListener('cancel', e => { e.preventDefault(); d.close('cancel'); });
+  for (const b of $$('[data-act="cancel"]', d)) b.addEventListener('click', () => d.close('cancel'));
+}
+const onClose = d => new Promise(res => d.addEventListener('close', () => res(d.returnValue), { once: true }));
+
+function confirmDlg(title, body, okLabel = 'OK', danger = false, cancellable = true) {
+  $('#confirmTitle').textContent = title;
+  $('#confirmBody').textContent = body;
+  const ok = $('#confirmOk');
+  ok.textContent = okLabel;
+  ok.className = 'btn ' + (danger ? 'danger' : 'primary');
+  $('[data-act="cancel"]', dlgConfirm).hidden = !cancellable;
+  dlgConfirm.returnValue = '';
+  dlgConfirm.showModal();
+  ok.focus();
+  return onClose(dlgConfirm).then(v => v === 'ok');
+}
+$('#confirmOk').addEventListener('click', () => dlgConfirm.close('ok'));
+
+function promptDlg(title, value = '', okLabel = 'Save') {
+  $('#promptTitle').textContent = title;
+  $('#promptOk').textContent = okLabel;
+  const inp = $('#promptInput');
+  inp.value = value;
+  dlgPrompt.returnValue = '';
+  dlgPrompt.showModal();
+  inp.focus(); inp.select();
+  return onClose(dlgPrompt).then(v => v === 'ok' ? inp.value.trim().slice(0, 40) : null);
+}
+$('form', dlgPrompt).addEventListener('submit', e => { e.preventDefault(); if ($('#promptInput').value.trim()) dlgPrompt.close('ok'); });
+
+// edit item
+let editingId = null;
+function openEdit(id) {
+  const it = item(id);
+  if (!it) return;
+  editingId = id;
+  $('#editText').value = it.text;
+  $('#editCat').innerHTML = state.cats.map(c => `<option value="${c.id}"${c.id === it.cat ? ' selected' : ''}>${esc(c.name)}</option>`).join('');
+  dlgEdit.returnValue = '';
+  dlgEdit.showModal();
+}
+$('form', dlgEdit).addEventListener('submit', e => {
+  e.preventDefault();
+  const it = item(editingId);
+  if (!it) return dlgEdit.close('cancel');
+  const text = $('#editText').value.trim().replace(/\s+/g, ' ');
+  const newCat = $('#editCat').value;
+  if (!text) { dlgEdit.close('cancel'); return removeItem(it.id); }
+  const moved = newCat !== it.cat && cat(newCat);
+  it.text = text;
+  if (moved) { it.cat = newCat; if (!it.done) moveToTop(it); }
+  save();
+  render();
+  dlgEdit.close('ok');
+  if (moved) toast(`Moved to ${cat(newCat).name}`);
+});
+$('#editText').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('form', dlgEdit).requestSubmit(); } });
+$('#editDelete').addEventListener('click', () => { const id = editingId; dlgEdit.close('cancel'); removeItem(id); });
+
+// ---------- categories ----------
+async function newCategory() {
+  const name = await promptDlg('New list', '', 'Create');
+  if (!name) return;
+  const c = { id: uid(), name };
+  state.cats.push(c);
+  state.active = c.id;
+  save();
+  render();
+  go(catIndex(c.id));
+  input.focus();
+}
+async function renameCategory() {
+  const c = cat(state.active);
+  const name = await promptDlg('Rename list', c.name, 'Rename');
+  if (!name || name === c.name) return;
+  c.name = name;
+  save();
+  render();
+}
+async function deleteCategory() {
+  const c = cat(state.active);
+  const others = state.cats.filter(x => x.id !== c.id);
+  const open = openItems(c.id), done = doneItems(c.id);
+  if (!others.length) return confirmDlg('Keep one list', 'This is your only list. Make another one before deleting it.', 'OK', false, false);
+  if (open.length) {
+    const target = await pickTarget(c, open.length, others);
+    if (!target) return;
+    pushUndo(`Deleted ${c.name}`);
+    for (const i of open) i.cat = target;
+    state.items = state.items.filter(i => i.cat !== c.id);
+    state.cats = others;
+    delete state.ui.collapsed[c.id];
+    state.active = target;
+  } else {
+    const body = done.length ? `${c.name} only has ${plural(done.length, 'done item')}. The list and those items will go.` : `${c.name} is empty.`;
+    if (!(await confirmDlg(`Delete ${c.name}?`, body, 'Delete', true))) return;
+    pushUndo(`Deleted ${c.name}`);
+    const i = catIndex(c.id);
+    state.items = state.items.filter(x => x.cat !== c.id);
+    state.cats = others;
+    delete state.ui.collapsed[c.id];
+    state.active = (others[i] || others[i - 1]).id;
+  }
+  save();
+  render();
+  go(catIndex(state.active), false);
+}
+function pickTarget(c, n, others) {
+  $('#moveTitle').textContent = `Delete ${c.name}?`;
+  $('#moveBody').textContent = `It still has ${plural(n, 'open item')}. Move ${n === 1 ? 'it' : 'them'} to:`;
+  $('#moveRadios').innerHTML = others.map((o, i) => `<label><input type="radio" name="moveTo" value="${o.id}"${i === 0 ? ' checked' : ''}>${esc(o.name)}</label>`).join('');
+  dlgMove.returnValue = '';
+  dlgMove.showModal();
+  return onClose(dlgMove).then(v => v === 'ok' ? ($('input[name="moveTo"]:checked', dlgMove) || {}).value || null : null);
+}
+$('form', dlgMove).addEventListener('submit', e => { e.preventDefault(); dlgMove.close('ok'); });
+
+// ---------- undo & toast ----------
+let toastTimer = 0, undoSnap = null;
+function toast(text, undoable = false) {
+  toastText.textContent = text;
+  toastBtn.hidden = !undoable;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), undoable ? 6000 : 2200);
+}
+function pushUndo(label) {
+  undoSnap = JSON.stringify(state);
+  toast(label, true);
+}
+toastBtn.addEventListener('click', () => {
+  if (!undoSnap) return;
+  try { state = migrate(JSON.parse(undoSnap)); } catch (_) { return; }
+  undoSnap = null;
+  save();
+  render();
+  go(catIndex(state.active), false);
+  toastEl.classList.remove('show');
+});
+
+// ---------- backup & restore ----------
+const stamp = () => new Date().toISOString().slice(0, 10);
+const exportJSON = () => JSON.stringify({ app: 'kitty', exported: new Date().toISOString(), ...state }, null, 1);
+const backupName = () => `kitty-backup-${stamp()}.json`;
+
+function emailHref() {
+  const json = exportJSON();
+  const body = `Kitty backup, ${stamp()}.\nTo restore: menu → Restore from backup → paste everything below this line.\n\n${json}`;
+  const href = `mailto:${BACKUP_TO}?subject=${encodeURIComponent(`Kitty backup ${stamp()}`)}&body=${encodeURIComponent(body)}`;
+  return href.length < 250000 ? href : null; // beyond this, mail apps get flaky — use the file instead
+}
+const downloadsNs = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
+async function saveBackup() {
+  const json = exportJSON(), name = backupName();
+  const dl = await downloadsNs;
+  if (dl) {
+    try { await dl.save({ filename: name, data: json }); toast('Backup saved'); }
+    catch (e) { if (!e || e.code !== 'declined') toast('Couldn’t save the file here'); }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+  toast('Backup saved to Downloads');
+}
+function extractJSON(text) {
+  const s = text.indexOf('{'), e = text.lastIndexOf('}');
+  if (s < 0 || e < s) throw new Error('No JSON found.');
+  return JSON.parse(text.slice(s, e + 1));
+}
+async function restoreFrom(text) {
+  const data = migrate(extractJSON(text));
+  pushUndo('Restored backup');
+  state = data;
+  save();
+  render();
+  go(catIndex(state.active), false);
+}
+function openRestore() {
+  $('#restoreFile').value = '';
+  $('#restoreText').value = '';
+  dlgRestore.returnValue = '';
+  dlgRestore.showModal();
+}
+$('#restoreFile').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) $('#restoreText').value = await f.text();
+});
+$('form', dlgRestore).addEventListener('submit', async e => {
+  e.preventDefault();
+  let text = $('#restoreText').value;
+  const f = $('#restoreFile').files && $('#restoreFile').files[0];
+  if (!text.trim() && f) text = await f.text();
+  if (!text.trim()) return;
+  try { await restoreFrom(text); dlgRestore.close('ok'); }
+  catch (err) { dlgRestore.close('cancel'); confirmDlg('Couldn’t restore', err.message || String(err), 'OK', false, false); }
+});
+
+// ---------- menu ----------
+$('#menuBtn').addEventListener('click', () => {
+  const c = cat(state.active);
+  $('#menuCatName').textContent = c.name;
+  $('#menuCatName2').textContent = c.name;
+  const a = $('#emailBackup');
+  const href = emailHref();
+  a.href = href || '#';
+  a.dataset.tooBig = href ? '' : '1';
+  const n = state.items.length, d = state.items.filter(i => i.done).length;
+  const local = !/^https?:$/.test(location.protocol);
+  const store = !storageOk ? 'storage unavailable — changes won’t survive a reload'
+    : local ? `opened as a local file (${location.protocol.replace(':', '')}) — the browser may not keep data between opens; host it at a URL`
+    : persisted === true ? 'stored on this phone, persistent' : persisted === false ? 'stored on this phone (best effort)' : 'stored on this phone';
+  $('#menuFoot').textContent = `Kitty v${SCHEMA} · ${plural(state.cats.length, 'list')} · ${n} items, ${d} done · ${store}`;
+  dlgMenu.returnValue = '';
+  dlgMenu.showModal();
+});
+$('#emailBackup').addEventListener('click', e => {
+  if (e.currentTarget.dataset.tooBig) { e.preventDefault(); dlgMenu.close(); confirmDlg('Too big for an email body', 'Save the backup file instead and attach it.', 'OK', false, false); return; }
+  setTimeout(() => dlgMenu.close(), 50);
+});
+dlgMenu.addEventListener('click', e => {
+  const b = e.target.closest('[data-menu]');
+  if (!b) return;
+  dlgMenu.close();
+  switch (b.dataset.menu) {
+    case 'newCat': return newCategory();
+    case 'renameCat': return renameCategory();
+    case 'deleteCat': return deleteCategory();
+    case 'saveBackup': return saveBackup();
+    case 'restore': return openRestore();
+  }
+});
+
+// ---------- gesture: drag-to-reorder via the ≡ handle ----------
+// Only the handle intercepts touches (touch-action: none). Everything else in
+// the deck is left to the browser, so a horizontal swipe anywhere changes list.
+let dg = null;
+
+deck.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  const handle = e.target.closest('.handle');
+  if (handle) dragStart(e, handle);
+});
+deck.addEventListener('pointermove', dragMove);
+deck.addEventListener('pointerup', dragEnd);
+deck.addEventListener('pointercancel', dragEnd);
+
+function dragStart(e, handle) {
+  const row = handle.closest('.row'), list = row.parentElement, panel = row.closest('.panel');
+  if (!list.classList.contains('open')) return;
+  e.preventDefault();
+  const r = row.getBoundingClientRect();
+  const ghost = row.cloneNode(true);
+  ghost.classList.add('ghost');
+  ghost.classList.remove('entering', 'pulse');
+  Object.assign(ghost.style, { top: r.top + 'px', left: r.left + 'px', width: r.width + 'px', height: r.height + 'px' });
+  document.body.appendChild(ghost);
+  row.classList.add('placeholder');
+  dg = { row, list, panel, ghost, y0: e.clientY, top0: r.top, id: e.pointerId, lastY: e.clientY, raf: 0 };
+  try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+  vibrate(8);
+  const loop = () => {
+    if (!dg) return;
+    const pr = dg.panel.getBoundingClientRect();
+    const edge = 56, speed = 9;
+    if (dg.lastY < pr.top + edge) dg.panel.scrollTop -= speed * (1 - (dg.lastY - pr.top) / edge);
+    else if (dg.lastY > pr.bottom - edge) dg.panel.scrollTop += speed * (1 - (pr.bottom - dg.lastY) / edge);
+    reorderAt(dg.lastY);
+    dg.raf = requestAnimationFrame(loop);
+  };
+  dg.raf = requestAnimationFrame(loop);
+}
+function dragMove(e) {
+  if (!dg || e.pointerId !== dg.id) return;
+  dg.lastY = e.clientY;
+  dg.ghost.style.top = (dg.top0 + dg.lastY - dg.y0) + 'px';
+  e.preventDefault();
+}
+function reorderAt(y) {
+  const rows = [...dg.list.children].filter(r => r !== dg.row);
+  let before = null;
+  for (const r of rows) {
+    const b = r.getBoundingClientRect();
+    if (y < b.top + b.height / 2) { before = r; break; }
+  }
+  if (before) { if (dg.row.nextSibling !== before) dg.list.insertBefore(dg.row, before); }
+  else if (dg.list.lastElementChild !== dg.row) dg.list.appendChild(dg.row);
+}
+function dragEnd(e) {
+  if (!dg || e.pointerId !== dg.id) return;
+  const d = dg; dg = null;
+  cancelAnimationFrame(d.raf);
+  d.ghost.remove();
+  d.row.classList.remove('placeholder');
+  suppressClick = true; setTimeout(() => { suppressClick = false; }, 80);
+  commitOrder(d.list.dataset.cat, [...d.list.children].map(r => r.dataset.id));
+}
+
+// ---------- celebration engine ----------
+// Variable-ratio reward: the chance of anything beyond a tick rises with the
+// item's age and with streaks, but never reaches certainty (except the first
+// ever completion). Size and effect are drawn at random from a pool.
+const fx = { canvas: $('#fx'), ctx: null, parts: [], running: false, dpr: 1, W: 0, H: 0 };
+fx.ctx = fx.canvas.getContext('2d');
+function fxResize() {
+  fx.dpr = Math.min(2, window.devicePixelRatio || 1);
+  fx.W = innerWidth; fx.H = innerHeight;
+  fx.canvas.width = fx.W * fx.dpr; fx.canvas.height = fx.H * fx.dpr;
+  fx.canvas.style.width = fx.W + 'px'; fx.canvas.style.height = fx.H + 'px';
+  fx.ctx.setTransform(fx.dpr, 0, 0, fx.dpr, 0, 0);
+}
+const COLORS = ['#F4B942', '#F26D5B', '#58A6E8', '#C85CB1', '#4FC3A1', '#FFD9A0', '#7CD992'];
+const EMOJI = ['🎉', '✨', '⭐', '🏆', '🍾', '💥', '🥳', '🌈'];
+function part(x, y, vx, vy, o = {}) {
+  fx.parts.push({
+    x, y, vx, vy,
+    g: o.g ?? 0.28, drag: o.drag ?? 0.985,
+    w: 5 + Math.random() * 7, h: 3 + Math.random() * 6,
+    rot: Math.random() * Math.PI * 2, vr: (Math.random() - .5) * .35,
+    color: pick(COLORS), life: 1, decay: o.decay ?? (0.007 + Math.random() * 0.008),
+    shape: o.emoji ? 'emoji' : (Math.random() < .3 ? 'circle' : 'rect'),
+    emoji: o.emoji ? pick(EMOJI) : null, size: 18 + Math.random() * 16,
+  });
+}
+function runFx() {
+  if (fx.running) return;
+  fx.running = true;
+  let last = performance.now();
+  const step = t => {
+    const dt = Math.min(2.5, (t - last) / 16.7); last = t;
+    const c = fx.ctx;
+    c.clearRect(0, 0, fx.W, fx.H);
+    for (const p of fx.parts) {
+      p.vy += p.g * dt; p.vx *= p.drag; p.vy *= p.drag;
+      p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; p.life -= p.decay * dt;
+      if (p.life <= 0) continue;
+      c.save();
+      c.globalAlpha = Math.max(0, Math.min(1, p.life * 1.4));
+      c.translate(p.x, p.y);
+      if (p.shape === 'emoji') { c.font = `${p.size}px sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.rotate(Math.sin(p.rot) * .4); c.fillText(p.emoji, 0, 0); }
+      else {
+        c.rotate(p.rot); c.fillStyle = p.color;
+        if (p.shape === 'circle') { c.beginPath(); c.arc(0, 0, p.w / 2.4, 0, Math.PI * 2); c.fill(); }
+        else { c.scale(1, Math.abs(Math.cos(p.rot * 1.7)) * .8 + .2); c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); }
+      }
+      c.restore();
+    }
+    fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.H + 40);
+    if (fx.parts.length) requestAnimationFrame(step);
+    else { fx.running = false; c.clearRect(0, 0, fx.W, fx.H); }
+  };
+  requestAnimationFrame(step);
+}
+function burst(x, y, n = 44, power = 10, o = {}) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, s = (0.35 + Math.random()) * power;
+    part(x, y, Math.cos(a) * s, Math.sin(a) * s - power * .35, o);
+  }
+  runFx();
+}
+function rain(n = 150, emoji = false) {
+  for (let i = 0; i < n; i++)
+    part(Math.random() * fx.W, -20 - Math.random() * fx.H * .6, (Math.random() - .5) * 2, 1.5 + Math.random() * 3, { g: 0.06, drag: 0.995, decay: 0.004 + Math.random() * 0.004, emoji });
+  runFx();
+}
+function fountain(n = 110) {
+  for (let i = 0; i < n; i++)
+    part(fx.W / 2 + (Math.random() - .5) * 60, fx.H + 10, (Math.random() - .5) * 11, -(15 + Math.random() * 11), { g: 0.32, decay: 0.006 + Math.random() * 0.006 });
+  runFx();
+}
+function fireworks() {
+  const shots = 3 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < shots; i++)
+    setTimeout(() => burst(fx.W * (0.2 + Math.random() * 0.6), fx.H * (0.15 + Math.random() * 0.4), 60, 9 + Math.random() * 4, { g: 0.18, decay: 0.009 }), i * 230);
+}
+function flash() {
+  const f = $('#flash');
+  f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+}
+function showMsg(text, big) {
+  const m = $('#fxText');
+  m.classList.remove('in', 'big'); void m.offsetWidth;
+  m.textContent = text;
+  if (big) m.classList.add('big');
+  m.classList.add('in');
+}
+function runEffect(name, cx, cy) {
+  switch (name) {
+    case 'burst': return burst(cx, cy, 36 + Math.floor(Math.random() * 20), 8 + Math.random() * 4);
+    case 'sparkle': return burst(cx, cy, 14, 5, { g: 0.05, decay: 0.02 });
+    case 'flash': flash(); return burst(cx, cy, 18, 6);
+    case 'rain': return rain();
+    case 'emoji': return rain(28, true);
+    case 'fountain': return fountain();
+    case 'fireworks': flash(); return fireworks();
+  }
+}
+
+const QUIPS = ['Done.', 'Ka pai.', 'Nice.', 'Ticked.', 'One less.', 'Sorted.', 'Tidy.', 'Gone.', 'Yes.'];
+const AGED = a => [`${a} in the making.`, `${a}. Finally.`, `That one lurked ${a.toLowerCase()}.`, `${a} of nagging, over.`, `Free at last.`, `${a}. Worth it?`, `Only took ${a.toLowerCase()}.`];
+const COMBO = ['Three in a row.', 'On a roll.', 'Momentum.', 'Unstoppable.', 'Keep going.'];
+let recentDone = [];
+function pickMessage(age, days, combo, first) {
+  if (first) return 'First one down.';
+  if (combo && Math.random() < .7) return pick(COMBO);
+  if (days >= 2 && Math.random() < .75) return pick(AGED(cap(ageLong(age))));
+  return pick(QUIPS);
+}
+function celebrate(it, checkEl) {
+  const t = now();
+  recentDone = recentDone.filter(x => t - x < 90e3);
+  recentDone.push(t);
+  const age = t - it.created, days = age / 864e5;
+  const combo = recentDone.length >= 3 && recentDone.length % 3 === 0;
+  const first = state.ui.doneCount === 1;
+  let p = days < 1 / 24 ? .06 : days < 1 ? .14 : days < 3 ? .28 : days < 7 ? .42 : days < 30 ? .58 : .72;
+  if (combo) p = Math.max(p, .85);
+  if (first) p = 1;
+  if (Math.random() > p) { vibrate(12); return; }
+  const big = Math.random() < (combo ? .7 : days >= 7 ? .6 : days >= 1 ? .35 : .15);
+  const r = checkEl.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const msg = pickMessage(age, days, combo, first);
+  vibrate(big ? [30, 40, 30, 40, 90] : [15, 30, 25]);
+  if (reducedMotion) { showMsg(msg, big); return; }
+  runEffect(big ? pick(['rain', 'fireworks', 'fountain', 'emoji', 'fireworks']) : pick(['burst', 'burst', 'sparkle', 'flash']), cx, cy);
+  if (big || Math.random() < .55) showMsg(msg, big);
+}
+
+// ---------- ages tick over without a full re-render ----------
+function refreshAges() {
+  for (const row of $$('.row:not(.done)', deck)) {
+    const it = item(row.dataset.id), el = $('.age', row);
+    if (!it || !el) continue;
+    el.textContent = ageShort(now() - it.created);
+    el.classList.toggle('old', now() - it.created > 3 * 864e5);
+  }
+}
+setInterval(refreshAges, 60e3);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshAges(); });
+
+// ---------- boot ----------
+state = load();
+fxResize();
+render();
+go(catIndex(state.active), false);
+addEventListener('pointerdown', requestPersistence, { once: true });
+window.__kitty = { get state() { return state; }, save, render, migrate, exportJSON }; // for debugging in devtools
+
+})();
+</script>
+<script>if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));</script>
+</body>
+</html>
