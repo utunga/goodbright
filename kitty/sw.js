@@ -1,8 +1,8 @@
 // Kitty service worker: keeps the app usable offline and installable.
 // Bump VERSION when the list of CORE files changes; index.html itself is
 // fetched network-first, so ordinary updates need no bump.
-const VERSION = 'kitty-v1';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
+const VERSION = 'kitty-v2';
+const CORE = ['./', './index.html', './crdt.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -13,6 +13,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  if ((req.headers.get('accept') || '').includes('text/event-stream')) return; // live sync pings
   const sameOrigin = new URL(req.url).origin === self.location.origin;
   if (req.mode === 'navigate' || sameOrigin) {
     // Network first so updates land as soon as you're online; cache keeps it working offline.

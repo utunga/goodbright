@@ -442,6 +442,12 @@
   .menu-item.danger .ic { color: var(--danger); }
   .menu-item small { display: block; color: var(--muted); font-size: 13px; }
   .menu-sep { height: 1px; background: var(--line); margin: 6px 12px; }
+  #menuBtn { position: relative; }
+  #menuBtn[data-sync]:not([data-sync=""])::after { content: ''; position: absolute; top: 12px; right: 10px; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+  #menuBtn[data-sync="ok"]::after { background: var(--accent); }
+  #menuBtn[data-sync="err"]::after { background: #D9A23A; }
+  #dlgSync .err { color: var(--danger); margin: 10px 0 0; min-height: 1em; font-size: 14px; }
+  #dlgSync:has(#syncOn[hidden]) .sync-on-btns, #dlgSync:has(#syncPair[hidden]) #syncGo { display: none; }
   .menu-foot { color: var(--faint); font-size: 12px; padding: 10px 12px 4px; }
 
   /* ---------- toast ---------- */
@@ -613,35 +619,82 @@
 </dialog>
 
 <!-- menu sheet -->
+<!-- sync with the laptop -->
+<dialog id="dlgSync">
+  <form method="dialog">
+    <h2>Sync with laptop</h2>
+    <div id="syncPair">
+      <p>Run the Kitty sync server on your laptop, then enter the address and pairing code it shows. Syncing happens whenever this device can reach the laptop.</p>
+      <label class="lbl" for="syncAddr">Address</label>
+      <input class="field" id="syncAddr" type="text" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="my-laptop.tail1234.ts.net">
+      <label class="lbl" for="syncCode">Pairing code</label>
+      <input class="field" id="syncCode" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="123 456">
+    </div>
+    <div id="syncOn" hidden>
+      <p id="syncStatus"></p>
+    </div>
+    <p class="err" id="syncErr" role="alert"></p>
+    <div class="actions">
+      <span id="syncOnBtns" class="sync-on-btns"><button class="btn quiet" type="button" id="syncOff" style="color: var(--danger)">Stop syncing</button><button class="btn" type="button" id="syncNow">Sync now</button></span>
+      <span class="spacer"></span>
+      <button class="btn" type="button" data-act="cancel">Close</button>
+      <button class="btn primary" type="submit" id="syncGo">Pair</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- first pairing with a laptop that already has lists -->
+<dialog id="dlgFirst">
+  <h2>Both have lists</h2>
+  <p id="firstBody"></p>
+  <p>Which lists should both devices keep? A copy of this device’s lists is saved either way.</p>
+  <div class="radios">
+    <button class="btn" type="button" data-how="theirs">Use the laptop’s lists</button>
+    <button class="btn" type="button" data-how="merge">Merge both</button>
+    <button class="btn" type="button" data-how="mine">Use this device’s lists</button>
+  </div>
+  <div class="actions"><button class="btn quiet" type="button" data-act="cancel">Cancel</button></div>
+</dialog>
+
 <dialog id="dlgMenu" class="sheet" aria-label="Menu">
   <div class="grip"></div>
   <button class="menu-item" type="button" data-menu="newCat"><span class="ic">+</span>New list</button>
   <button class="menu-item" type="button" data-menu="renameCat"><span class="ic">✎</span><span>Rename <b id="menuCatName"></b></span></button>
   <button class="menu-item danger" type="button" data-menu="deleteCat"><span class="ic">×</span><span>Delete <b id="menuCatName2"></b></span></button>
   <div class="menu-sep"></div>
+  <button class="menu-item" type="button" data-menu="sync"><span class="ic">⇄</span><span>Sync with laptop<small id="menuSync"></small></span></button>
   <a class="menu-item" id="emailBackup" href="#"><span class="ic">✉</span><span>Email backup<small>to utunga@gmail.com</small></span></a>
   <button class="menu-item" type="button" data-menu="saveBackup" id="saveBackupItem"><span class="ic">⤓</span>Save backup file</button>
   <button class="menu-item" type="button" data-menu="restore"><span class="ic">⤒</span>Restore from backup</button>
   <div class="menu-sep"></div>
   <div class="menu-foot" id="menuFoot"></div>
 </dialog>
+<script src="crdt.js"></script>
 <script>
 (() => {
 'use strict';
 
 /* =====================================================================
    Kitty — lists for a phone.
-   Data lives in localStorage under KEY as one JSON document:
+   The app works on `state`, one JSON document saved under KEY:
      { v, cats:[{id,name}], items:[{id,cat,text,created,done}], active, ui }
    items[] order is the manual order of OPEN items within a list.
    Done items sort by completion time. Bump SCHEMA and add a MIGRATIONS[n]
    step whenever the shape changes; load() and restore() both run them.
+   Backups are this shape too.
+
+   For sync, save() also writes the lists into a CRDT doc (crdt.js) under
+   DOC_KEY, stamping only what changed; a merged doc from the laptop comes
+   back through applyRemote(). active and ui.collapsed stay per device.
    ===================================================================== */
 
 const SCHEMA = 1;
 const KEY = 'kitty.data';
 const LEGACY_KEY = 'kete.data'; // name before the rename; read as a fallback
 const BACKUP_TO = 'utunga@gmail.com';
+const DOC_KEY = 'kitty.doc';     // synced CRDT copy of the lists
+const LOCAL_KEY = 'kitty.local'; // this device: id, clock, sync settings
+const K = window.KittyCRDT;
 
 // ---------- utils ----------
 const $ = (s, r = document) => r.querySelector(s);
@@ -718,9 +771,50 @@ function seed() {
 }
 
 // ---------- storage ----------
-let state;
+let state, doc, local;
 let storageOk = true;
 let persisted = null;
+let savedSig = '';
+// FNV-1a, to tell whether KEY was last written by this version of the app.
+function sig(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619); return (h >>> 0).toString(36) + ':' + str.length; }
+function loadLocal() {
+  let l = null;
+  try { l = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); } catch (_) {}
+  if (!l || typeof l !== 'object' || !l.dev) l = { dev: uid().slice(-8), ms: 0, c: 0 };
+  return l;
+}
+function loadDoc() {
+  try { const raw = localStorage.getItem(DOC_KEY); return raw ? K.cleanDoc(JSON.parse(raw)) : null; } catch (_) { return null; }
+}
+const viewOf = s => ({ cats: s.cats, items: s.items, doneCount: s.ui.doneCount || 0 });
+// Replace the lists in state with what the doc says, keeping per-device bits.
+function fromDoc() {
+  const v = K.materialize(doc);
+  state.cats = v.cats;
+  state.items = v.items;
+  state.ui.doneCount = v.doneCount;
+  if (!state.cats.length) state.cats.push({ id: uid(), name: 'Personal' });
+  if (!cat(state.active)) state.active = state.cats[0].id;
+  for (const k of Object.keys(state.ui.collapsed)) if (!cat(k)) delete state.ui.collapsed[k];
+}
+function boot() {
+  local = loadLocal();
+  state = load();
+  doc = loadDoc();
+  let raw = null;
+  try { raw = localStorage.getItem(KEY); } catch (_) {}
+  if (!doc) {
+    // First run of the sync-aware version: the lists so far become the doc.
+    doc = K.emptyDoc();
+    if (raw) try { localStorage.setItem(`${KEY}.pre-sync`, raw); } catch (_) {}
+  } else if (!raw || sig(raw) === local.sig) {
+    // KEY is exactly what we last wrote alongside the doc (or is missing): the doc is the truth.
+    fromDoc();
+  }
+  // Otherwise KEY was changed by something else (an older Kitty after a
+  // rollback): save() below folds those changes into the doc as new edits.
+  save();
+}
 function load() {
   let raw = null;
   try { raw = localStorage.getItem(KEY) || localStorage.getItem(LEGACY_KEY); } catch (_) { storageOk = false; }
@@ -736,8 +830,17 @@ function load() {
   }
 }
 function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(state)); storageOk = true; }
-  catch (e) { storageOk = false; console.error(e); }
+  const n = K.commit(doc, viewOf(state), local);
+  // Order matters for crash safety: KEY, then the doc, then the signature.
+  try {
+    const raw = JSON.stringify(state);
+    localStorage.setItem(KEY, raw);
+    localStorage.setItem(DOC_KEY, JSON.stringify(doc));
+    local.sig = sig(raw);
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(local));
+    storageOk = true;
+  } catch (e) { storageOk = false; console.error(e); }
+  if (n) sync.soon();
 }
 function requestPersistence() {
   try {
@@ -1224,6 +1327,188 @@ $('form', dlgRestore).addEventListener('submit', async e => {
   catch (err) { dlgRestore.close('cancel'); confirmDlg('Couldn’t restore', err.message || String(err), 'OK', false, false); }
 });
 
+// ---------- sync with the laptop ----------
+// The laptop runs kitty/server/kitty-sync.js. We POST our doc, it merges and
+// answers with the merged doc, which we merge back. It pings us over
+// server-sent events when another device changes something.
+function applyRemote(remote) {
+  if (dg) { sync.again = true; return false; } // not under a finger mid-drag; retried shortly
+  if (!K.merge(doc, K.cleanDoc(remote))) return false;
+  K.observe(local, doc);
+  const before = JSON.stringify(viewOf(state));
+  fromDoc();
+  save();
+  if (JSON.stringify(viewOf(state)) !== before) { render(); go(catIndex(state.active), false); }
+  return true;
+}
+const deviceName = () => /iPhone/.test(navigator.userAgent) ? 'iPhone' : /iPad/.test(navigator.userAgent) ? 'iPad' : /Android/.test(navigator.userAgent) ? 'Android' : /Mac/.test(navigator.userAgent) ? 'Mac browser' : 'Browser';
+function serverURL(s) {
+  s = String(s || '').trim().replace(/\/+$/, '');
+  if (!s) return '';
+  if (!/^https?:\/\//.test(s)) s = 'https://' + s;
+  if (!/:\d+$/.test(s.replace(/^https?:\/\//, '')) && !/\.ts\.net$/.test(s)) s += ':8787';
+  return s;
+}
+async function call(url, path, body, token) {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const res = await fetch(url + path, {
+      method: 'POST', signal: ctl.signal, cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: JSON.stringify(body),
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(j.error || `The laptop said ${res.status}.`), { status: res.status });
+    return j;
+  } catch (e) {
+    if (e.status) throw e;
+    throw new Error(e.name === 'AbortError' ? 'The laptop didn’t answer in time.' : 'Can’t reach the laptop. Same Wi-Fi? Sync server running?');
+  } finally { clearTimeout(t); }
+}
+const sync = {
+  busy: false, again: false, timer: 0, es: null, state: 'off', error: '',
+  get on() { return !!(local.sync && local.sync.token); },
+  soon() { if (!this.on) return; clearTimeout(this.timer); this.timer = setTimeout(() => this.now(), 400); },
+  async now() {
+    if (!this.on) return;
+    if (this.busy) { this.again = true; return; }
+    this.busy = true; this.again = false;
+    const s = local.sync;
+    try {
+      const r = await call(s.url, '/sync', { doc }, s.token);
+      if (local.sync !== s) return; // unpaired meanwhile
+      applyRemote(r.doc);
+      s.last = now(); s.server = r.server || s.server;
+      this.set('ok', '');
+      try { localStorage.setItem(LOCAL_KEY, JSON.stringify(local)); } catch (_) {}
+      this.listen();
+    } catch (e) {
+      if (e.status === 401) { this.set('err', 'The laptop doesn’t know this device any more. Pair again.'); }
+      else this.set('err', e.message);
+    } finally {
+      this.busy = false;
+      if (this.again) this.soon();
+    }
+  },
+  listen() {
+    if (!this.on || typeof EventSource === 'undefined') return;
+    if (this.es && this.es.readyState === 1) return;
+    this.stop(); // a stale or retrying stream after the laptop restarted: start afresh
+    const s = local.sync;
+    this.es = new EventSource(`${s.url}/events?token=${encodeURIComponent(s.token)}`);
+    this.es.addEventListener('changed', () => this.now());
+    this.es.addEventListener('open', () => this.now()); // catch up on anything missed while disconnected
+  },
+  stop() { if (this.es) { this.es.close(); this.es = null; } },
+  set(st, err) { this.state = st; this.error = err; menuBtn.dataset.sync = this.on ? st : ''; if (dlgSync.open) showSync(); },
+  start() {
+    menuBtn.dataset.sync = this.on ? 'idle' : '';
+    if (!this.on) return;
+    this.now();
+    if (this.started) return;
+    this.started = true;
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.now(); else this.stop(); });
+    addEventListener('online', () => this.now());
+    setInterval(() => { if (document.visibilityState === 'visible') this.now(); }, 30e3);
+  },
+};
+const menuBtn = $('#menuBtn'), dlgSync = $('#dlgSync');
+function syncSummary() {
+  if (!sync.on) return 'not set up';
+  const s = local.sync;
+  if (sync.state === 'err') return `${s.server || 'laptop'}: ${sync.error}`;
+  if (!s.last) return `paired with ${s.server || 'laptop'}`;
+  const m = (now() - s.last) / 6e4;
+  return `synced with ${s.server || 'laptop'} ${m < 1 ? 'just now' : m < 60 ? Math.floor(m) + ' min ago' : ageShort(now() - s.last) + ' ago'}`;
+}
+function showSync() {
+  const on = sync.on;
+  $('#syncPair').hidden = on;
+  $('#syncOn').hidden = !on;
+  $('#syncStatus').textContent = on ? syncSummary().replace(/^./, c => c.toUpperCase()) + '.' : '';
+  $('#syncErr').textContent = '';
+}
+function openSync() {
+  if (!sync.on) {
+    $('#syncAddr').value = (local.sync && local.sync.url) || local.lastServer || '';
+    $('#syncCode').value = '';
+  }
+  showSync();
+  dlgSync.returnValue = '';
+  dlgSync.showModal();
+}
+// First contact with a laptop that already has lists: ask how to combine.
+function choose(mine, theirs, server) {
+  const count = v => `${plural(v.cats.length, 'list')}, ${plural(v.items.length, 'item')}`;
+  $('#firstBody').textContent = `This device has ${count(mine)}. ${server} has ${count(theirs)}.`;
+  dlgFirst.returnValue = '';
+  dlgFirst.showModal();
+  return onClose(dlgFirst);
+}
+async function pair(addr, code) {
+  const url = serverURL(addr);
+  const p = await call(url, '/pair', { code, name: deviceName() });
+  const r = await call(url, '/sync', {}, p.token);
+  const theirs = K.materialize(K.cleanDoc(r.doc));
+  const mine = viewOf(state);
+  let how = 'merge';
+  if (theirs.items.length || theirs.cats.length) how = await choose(mine, theirs, p.server);
+  if (!how || how === 'cancel') return false;
+  try { localStorage.setItem(`${KEY}.before-sync-${now()}`, JSON.stringify(state)); } catch (_) {}
+  if (how === 'theirs') {
+    // Start over from the laptop's copy; this device's lists are dropped.
+    doc = K.cleanDoc(r.doc);
+    K.observe(local, doc);
+    fromDoc();
+  } else {
+    K.merge(doc, K.cleanDoc(r.doc));
+    K.observe(local, doc);
+    if (how === 'merge') {
+      // Lists with the same name become one; same-text open items then fold together.
+      fromDoc();
+      const keep = new Map();
+      for (const c of state.cats) { const k = c.name.toLowerCase(); if (!keep.has(k)) keep.set(k, c.id); }
+      for (const i of state.items) { const c = cat(i.cat); if (c) i.cat = keep.get(c.name.toLowerCase()); }
+      state.cats = state.cats.filter(c => keep.get(c.name.toLowerCase()) === c.id);
+      if (!cat(state.active)) state.active = state.cats[0].id;
+      save();
+      fromDoc();
+    }
+    // how === 'mine': save() below writes this device's view over the merged doc.
+  }
+  local.sync = { url, token: p.token, server: p.server, last: 0 };
+  local.lastServer = url;
+  save();
+  render();
+  go(catIndex(state.active), false);
+  sync.start();
+  await sync.now();
+  return true;
+}
+$('form', dlgSync).addEventListener('submit', async e => {
+  e.preventDefault();
+  if (sync.on) return dlgSync.close('ok');
+  const btn = $('#syncGo'), err = $('#syncErr');
+  btn.disabled = true; err.textContent = 'Connecting…';
+  try {
+    const ok = await pair($('#syncAddr').value, $('#syncCode').value.replace(/\D/g, ''));
+    err.textContent = '';
+    if (ok) { dlgSync.close('ok'); toast(`Syncing with ${local.sync.server}`); }
+  } catch (x) { err.textContent = x.message; }
+  finally { btn.disabled = false; }
+});
+$('#syncNow').addEventListener('click', () => { $('#syncStatus').textContent = 'Syncing…'; sync.now(); });
+$('#syncOff').addEventListener('click', async () => {
+  if (!(await confirmDlg('Stop syncing?', 'This device keeps its lists. You can pair again later with a new code.', 'Stop syncing'))) return;
+  sync.stop();
+  local.sync = null;
+  sync.set('off', '');
+  save();
+  dlgSync.close('ok');
+});
+const dlgFirst = $('#dlgFirst');
+for (const b of $$('[data-how]', dlgFirst)) b.addEventListener('click', () => dlgFirst.close(b.dataset.how));
+
 // ---------- menu ----------
 $('#menuBtn').addEventListener('click', () => {
   const c = cat(state.active);
@@ -1238,6 +1523,7 @@ $('#menuBtn').addEventListener('click', () => {
   const store = !storageOk ? 'storage unavailable — changes won’t survive a reload'
     : local ? `opened as a local file (${location.protocol.replace(':', '')}) — the browser may not keep data between opens; host it at a URL`
     : persisted === true ? 'stored on this phone, persistent' : persisted === false ? 'stored on this phone (best effort)' : 'stored on this phone';
+  $('#menuSync').textContent = syncSummary();
   $('#menuFoot').textContent = `Kitty v${SCHEMA} · ${plural(state.cats.length, 'list')} · ${n} items, ${d} done · ${store}`;
   dlgMenu.returnValue = '';
   dlgMenu.showModal();
@@ -1256,6 +1542,7 @@ dlgMenu.addEventListener('click', e => {
     case 'deleteCat': return deleteCategory();
     case 'saveBackup': return saveBackup();
     case 'restore': return openRestore();
+    case 'sync': return openSync();
   }
 });
 
@@ -1468,12 +1755,13 @@ setInterval(refreshAges, 60e3);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshAges(); });
 
 // ---------- boot ----------
-state = load();
+boot();
 fxResize();
 render();
 go(catIndex(state.active), false);
 addEventListener('pointerdown', requestPersistence, { once: true });
-window.__kitty = { get state() { return state; }, save, render, migrate, exportJSON }; // for debugging in devtools
+sync.start();
+window.__kitty = { get state() { return state; }, get doc() { return doc; }, get local() { return local; }, save, render, migrate, exportJSON, sync }; // for debugging in devtools
 
 })();
 </script>
