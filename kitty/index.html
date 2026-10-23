@@ -645,14 +645,13 @@
 
 <!-- first pairing with a laptop that already has lists -->
 <dialog id="dlgFirst">
-  <h2>Both have lists</h2>
+  <h2>The sync server already has lists</h2>
   <p id="firstBody"></p>
-  <p>Which lists should both devices keep? A copy of this device’s lists is saved either way.</p>
   <div class="radios">
-    <button class="btn" type="button" data-how="theirs">Use the laptop’s lists</button>
-    <button class="btn" type="button" data-how="merge">Merge both</button>
-    <button class="btn" type="button" data-how="mine">Use this device’s lists</button>
+    <button class="btn primary" type="button" data-how="theirs" id="firstTheirs">Use the synced lists here</button>
+    <button class="btn" type="button" data-how="merge">Merge in this device’s lists too</button>
   </div>
+  <p style="margin-top: 14px">A copy of this device’s lists is saved either way.</p>
   <div class="actions"><button class="btn quiet" type="button" data-act="cancel">Cancel</button></div>
 </dialog>
 
@@ -1440,7 +1439,8 @@ function openSync() {
 // First contact with a laptop that already has lists: ask how to combine.
 function choose(mine, theirs, server) {
   const count = v => `${plural(v.cats.length, 'list')}, ${plural(v.items.length, 'item')}`;
-  $('#firstBody').textContent = `This device has ${count(mine)}. ${server} has ${count(theirs)}.`;
+  $('#firstBody').textContent = `${server} has ${count(theirs)}, already shared with your other devices. This device has ${count(mine)}.`;
+  $('#firstTheirs').textContent = `Use the synced lists here (${plural(theirs.items.length, 'item')})`;
   dlgFirst.returnValue = '';
   dlgFirst.showModal();
   return onClose(dlgFirst);
@@ -1474,7 +1474,6 @@ async function pair(addr, code) {
       save();
       fromDoc();
     }
-    // how === 'mine': save() below writes this device's view over the merged doc.
   }
   local.sync = { url, token: p.token, server: p.server, last: 0 };
   local.lastServer = url;

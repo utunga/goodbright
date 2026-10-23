@@ -54,9 +54,13 @@ In Kitty: menu ⋯ → **Sync with laptop** → enter the address and the code.
 
 Type the address without `https://` if you like (e.g.
 `miles-macbook.tail1234.ts.net`). Then pair Kitty in the laptop's browser the same way. Because the server
-already has lists by then, Kitty asks which to keep. Choose **Use the
-laptop's lists** (meaning the server's copy, which is the phone's). Every choice saves a copy of
-that device's lists first (in localStorage, `kitty.data.before-sync-…`).
+already has lists by then, Kitty asks what to do: **Use the synced lists here** (what you want when the
+other device has the real lists) or **Merge in this device's lists too**.
+Either way it saves a copy of that device's lists first (in localStorage,
+`kitty.data.before-sync-…`).
+
+If a pairing ever goes wrong, `node kitty/server/undo-pairing.js` shows (and
+with `--apply`, undoes) what a device deleted on the server.
 
 Restart the server to get a fresh code. Paired devices stay paired across
 restarts. To unpair a device, delete its entry from `~/.kitty-sync/tokens.json`.
