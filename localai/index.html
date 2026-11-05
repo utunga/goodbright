@@ -1,0 +1,199 @@
+---
+# Landing page for the QR code on the last slide of the talk
+# "Local Models, Sovereign AI & Agentic Governance" (AI Engineering Meetup, Wellington).
+# Self-contained on purpose: no site layout, no web fonts, no external JS, so it loads fast on a phone.
+#
+# ---- things to fill in ----
+# talk_date:      shown under the heading. Leave the brackets until it's confirmed.
+# slides_url:     drop the PDF at localai/slides.pdf and this already points at it.
+# slides_ready:   set to true once the PDF is actually there (hides the "going up shortly" note).
+# signup_action:  Google Form "formResponse" URL ("Sovereign and Local AI : Wellington Working Group").
+#                 Responses land in that form / its linked Sheet.
+#                 Leave blank and the sign-up falls back to emailing Miles.
+# signup_*_field: the form's entry IDs (from the form's page source). If you edit the
+#                 questions in Google Forms these may change, so re-check them.
+talk_date: "5 November 2026"
+slides_url: /localai/slides.pdf
+slides_ready: false
+signup_action: "https://docs.google.com/forms/d/e/1FAIpQLSc86alODjTzzelHl4GuP8wxCt4xMnX-aClxu9Ft0Zj9Yz6E1g/formResponse"
+signup_name_field: entry.1645737664
+signup_email_field: entry.1812899896
+signup_comments_field: entry.930254724
+---
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local AI talk · Miles Thompson</title>
+<meta name="description" content="Slides and next steps from Miles Thompson's talk on local models, sovereign AI and agentic governance.">
+<meta name="author" content="Miles Thompson">
+<meta name="theme-color" content="#1a222c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Local AI talk · Miles Thompson">
+<meta property="og:description" content="Slides and next steps from Miles Thompson's talk on local models, sovereign AI and agentic governance.">
+<meta property="og:url" content="https://goodbright.nz/localai/">
+<meta property="og:image" content="https://goodbright.nz/assets/img/goodbright_logo_sq.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #1a222c;
+    --panel: #232d3a;
+    --line: #34404f;
+    --text: #eef1f4;
+    --muted: #a3adb9;
+    --accent: #f2c14e;
+    --accent-ink: #1a222c;
+    --accent-2: #8fd3c1;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  main {
+    max-width: 34rem;
+    margin: 0 auto;
+    padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  }
+  h1 { font-size: 1.75rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--text); font-size: 1.12rem; line-height: 1.4; font-weight: 500; margin: 4px 0 6px; }
+  .date { color: var(--muted); font-size: 0.85rem; margin: 0 0 22px; }
+  h2 {
+    font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 0 0 10px;
+  }
+  section { margin-bottom: 22px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px; }
+  .card h3 { font-size: 1.15rem; margin: 0 0 8px; line-height: 1.3; }
+  .card p { margin: 0 0 14px; color: #d5dbe2; font-size: 0.97rem; }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 54px; padding: 14px 18px;
+    border: 0; border-radius: 12px; cursor: pointer;
+    font: inherit; font-size: 1.08rem; font-weight: 700; text-decoration: none; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-secondary { background: var(--accent-2); color: var(--accent-ink); }
+  .btn:active { transform: translateY(1px); filter: brightness(0.95); }
+  .btn:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .note { font-size: 0.85rem; color: var(--muted); margin: 8px 0 0; text-align: center; }
+
+  label.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  input[type=email], input[type=text] {
+    display: block; width: 100%; min-height: 54px; margin: 0 0 10px; padding: 12px 14px;
+    border: 1px solid var(--line); border-radius: 12px;
+    background: #10161d; color: var(--text); font: inherit; font-size: 1.05rem; /* >=16px stops iOS zoom */
+  }
+  input::placeholder { color: #75808d; }
+  .done { display: none; margin: 0; padding: 14px; border-radius: 12px; background: #1f3a33; color: #d9f5ec; font-weight: 600; text-align: center; }
+  .signup.is-done form { display: none; }
+  .signup.is-done .done { display: block; }
+
+  .contact { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 28px; font-size: 0.95rem; color: var(--muted); }
+  .contact p { margin: 0 0 10px; }
+  .vcard {
+    margin-top: 14px; padding: 20px 20px 16px;
+    background: #f4f1ea; color: #1a222c;
+    border-left: 4px solid var(--accent); border-radius: 12px;
+  }
+  .vcard .name { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.01em; color: #1a222c; margin: 0; }
+  .vcard .role { color: #5a6573; margin: 2px 0 12px; }
+  .vcard ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid #ddd6c8; }
+  .vcard li { border-bottom: 1px solid #ddd6c8; }
+  .vcard li:last-child { border-bottom: 0; }
+  .vcard a { display: block; padding: 10px 0; color: #1a222c; text-decoration: none; font-size: 1.02rem; }
+  .vcard a.site { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .ph { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Thanks for coming to the talk</h1>
+  <p class="sub"><em>Local Models, Sovereign AI &amp; Agentic Governance · AI Engineering Meetup, Wellington</em></p>
+  <p class="date"><span{% if page.talk_date contains "[" %} class="ph"{% endif %}>{{ page.talk_date }}</span></p>
+
+  <section aria-labelledby="slides-h">
+    <h2 id="slides-h">The slides</h2>
+    <a class="btn btn-primary" href="{{ page.slides_url }}">Download the slides (PDF)</a>
+    {% unless page.slides_ready %}<p class="note">Slides going up shortly. Check back later today.</p>{% endunless %}
+  </section>
+
+  <section aria-labelledby="local-h">
+    <h2 id="local-h">Local AI for Wellington</h2>
+    <div class="card signup" id="signup">
+      <h3>Interested in local AI for Wellington?</h3>
+      <p>A group of us are working out what it would take to host AI models in a data centre here in Wellington, run for and governed by the people who use them. If you'd like to be part of it, whether you run infrastructure, build software, or would use it, I'm setting up a mailing list to discuss.</p>
+      <form id="signup-form" method="POST"
+            action="{% if page.signup_action != '' %}{{ page.signup_action }}{% else %}mailto:utunga@gmail.com?subject=Local%20AI%20for%20Wellington%20-%20count%20me%20in{% endif %}"
+            {% if page.signup_action == '' %}enctype="text/plain"{% endif %}
+            data-configured="{% if page.signup_action != '' %}yes{% else %}no{% endif %}">
+        <label class="vh" for="name">Your name</label>
+        <input id="name" type="text" name="{{ page.signup_name_field | default: 'name' }}"
+               placeholder="Your name" autocomplete="name" required>
+        <label class="vh" for="email">Your email address</label>
+        <input id="email" type="email" name="{{ page.signup_email_field | default: 'email' }}"
+               placeholder="you@example.com" autocomplete="email" inputmode="email" required>
+        <label class="vh" for="comments">Affiliation or comments (optional)</label>
+        <input id="comments" type="text" name="{{ page.signup_comments_field | default: 'comments' }}"
+               placeholder="Affiliation or comments (optional)" autocomplete="organization">
+        <button class="btn btn-secondary" type="submit">I'm interested!</button>
+      </form>
+      <p class="done" role="status">Thanks, you're on the list. I'll be in touch.</p>
+    </div>
+  </section>
+
+  <footer class="contact" aria-labelledby="contact-h">
+    <h2 id="contact-h">Get in touch</h2>
+    <p>If you want to get in touch with me, I am ..</p>
+    <div class="vcard">
+      <p class="name">Miles Thompson</p>
+      <p class="role">AI Researcher / Engineer</p>
+      <ul>
+        <li><a href="mailto:utunga@gmail.com">utunga@gmail.com</a></li>
+        <li><a href="tel:+6421539843">021 539 843</a></li>
+        <li><a class="site" href="https://goodbright.nz/#resume">goodbright.nz</a></li>
+      </ul>
+    </div>
+  </footer>
+</main>
+<script>
+  // Google Forms accepts a cross-origin POST but doesn't let us read the reply,
+  // so send it "no-cors", then show the thank-you in place. Without JS the form
+  // still posts normally and lands on Google's own confirmation page.
+  (function () {
+    var form = document.getElementById('signup-form');
+    if (!form) return;
+    // Not wired to a Google Form yet: open an email to Miles with their address in it.
+    if (form.getAttribute('data-configured') !== 'yes') {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = function (id) { return document.getElementById(id).value; };
+        location.href = 'mailto:utunga@gmail.com'
+          + '?subject=' + encodeURIComponent('Local AI for Wellington: count me in')
+          + '&body=' + encodeURIComponent('Please add me to the mailing list.\n\nName: ' + v('name')
+            + '\nEmail: ' + v('email') + '\nAffiliation / comments: ' + v('comments'));
+      });
+      return;
+    }
+    if (!window.fetch) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = form.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Adding you…';
+      fetch(form.action, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) })
+        .then(function () { document.getElementById('signup').classList.add('is-done'); })
+        .catch(function () { form.submit(); });
+    });
+  })();
+</script>
+</body>
+</html>
