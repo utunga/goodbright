@@ -14,7 +14,8 @@
 #                 questions in Google Forms these may change, so re-check them.
 talk_date: "5 November 2026"
 slides_url: /localai/slides.pdf
-slides_ready: false
+talk_url: /localai/2026-11-05-talk/
+slides_ready: true
 signup_action: "https://docs.google.com/forms/d/e/1FAIpQLSc86alODjTzzelHl4GuP8wxCt4xMnX-aClxu9Ft0Zj9Yz6E1g/formResponse"
 signup_name_field: entry.1645737664
 signup_email_field: entry.1812899896
@@ -83,6 +84,7 @@ signup_comments_field: entry.930254724
   }
   .btn-primary { background: var(--accent); color: var(--accent-ink); }
   .btn-secondary { background: var(--accent-2); color: var(--accent-ink); }
+  .btn-outline { background: transparent; color: var(--text); border: 2px solid var(--accent); margin-top: 10px; }
   .btn:active { transform: translateY(1px); filter: brightness(0.95); }
   .btn:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
   .note { font-size: 0.85rem; color: var(--muted); margin: 8px 0 0; text-align: center; }
@@ -124,6 +126,7 @@ signup_comments_field: entry.930254724
   <section aria-labelledby="slides-h">
     <h2 id="slides-h">The slides</h2>
     <a class="btn btn-primary" href="{{ page.slides_url }}">Download the slides (PDF)</a>
+    <a class="btn btn-outline" href="{{ page.talk_url }}">View the interactive version →</a>
     {% unless page.slides_ready %}<p class="note">Slides going up shortly. Check back later today.</p>{% endunless %}
   </section>
 
